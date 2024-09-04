@@ -6,6 +6,7 @@ const csurf = require('csurf');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const { ValidationError } = require('sequelize');
+const routes = require('./routes');
 
 const { environment } = require('./config');
 const isProduction = environment === 'production';
@@ -41,11 +42,9 @@ if (!isProduction) {
     })
   );
 
-  // backend/app.js
-const routes = require('./routes');
 
-// backend/app.js
-// ...
+app.use(routes); // Connect all the routes
+
 // Catch unhandled requests and forward to error handler.
 app.use((_req, _res, next) => {
   const err = new Error("The requested resource couldn't be found.");
@@ -81,6 +80,5 @@ app.use((err, _req, res, _next) => {
 });
 // ...
 
-app.use(routes); // Connect all the routes
 
 module.exports = app;

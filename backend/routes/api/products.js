@@ -1,16 +1,39 @@
 const express = require('express');
-const { Product } = require('../../db/models'); // Make sure to update this path based on your project structure
-const { requireAuth } = require('../../utils/auth'); // Import your requireAuth middleware
+const { Product, ProductImage } = require('../../db/models');
+const { requireAuth } = require('../../utils/auth');
 const router = express.Router();
 
 // GET /api/products/
-// Returns the information for all products
+// Returns the information for all products, including images
 router.get('/', async (req, res, next) => {
+  const { category } = req.query; // Get category from query parameters
+  const page = parseInt(req.query.page) || 1; // Current page, default is 1
+  const limit = parseInt(req.query.limit) || 20; // Items per page, default is 20
+  const offset = (page - 1) * limit; // Calculate the offset
+
   try {
-    const products = await Product.findAll({
-      attributes: ['id', 'name', 'description', 'category', 'brand', 'model_number', 'created_at', 'updated_at']
+    const where = category ? { category } : {}; // Filter by category if provided
+
+    const { count, rows: products } = await Product.findAndCountAll({
+      where, // Apply the category filter
+      limit: limit, // Limit the number of results per page
+      offset: offset, // Skip the appropriate number of rows
+      attributes: ['id', 'name', 'description', 'category', 'brand', 'model_number', 'createdAt', 'updatedAt'],
+      include: [{ // Include associated ProductImages
+        model: ProductImage,
+        as: 'images', // Alias for the association
+        attributes: ['id', 'url']
+      }],
     });
-    return res.json(products);
+
+    // Calculate total pages
+    const totalPages = Math.ceil(count / limit);
+
+    return res.json({
+      products,
+      totalPages,
+      currentPage: page,
+    });
   } catch (err) {
     next(err);
   }
@@ -19,9 +42,10 @@ router.get('/', async (req, res, next) => {
 // POST /api/products/
 // Creates a new product (Requires authentication)
 router.post('/', requireAuth, async (req, res, next) => {
-  const { name, description, category, brand, model_number } = req.body;
+  const { name, description, category, brand, model_number, images } = req.body;
 
   try {
+    // Create the product first
     const newProduct = await Product.create({
       name,
       description,
@@ -30,20 +54,39 @@ router.post('/', requireAuth, async (req, res, next) => {
       model_number
     });
 
-    return res.status(201).json(newProduct);
+
+    if (images && images.length > 0) {
+      const imageInstances = images.map((url) => ({
+        product_id: newProduct.id,
+        url
+      }));
+      await ProductImage.bulkCreate(imageInstances);
+    }
+
+    // Fetch the product with associated images
+    const productWithImages = await Product.findByPk(newProduct.id, {
+      include: [{ model: ProductImage, as: 'images', attributes: ['id', 'url'] }]
+    });
+
+    return res.status(201).json(productWithImages);
   } catch (err) {
     next(err);
   }
 });
 
 // GET /api/products/:id
-// Returns the information for one product
+// Returns the information for one product, including images
 router.get('/:id', async (req, res, next) => {
   const { id } = req.params;
 
   try {
     const product = await Product.findByPk(id, {
-      attributes: ['id', 'name', 'description', 'category', 'brand', 'model_number', 'created_at', 'updated_at']
+      attributes: ['id', 'name', 'description', 'category', 'brand', 'model_number', 'createdAt', 'updatedAt'],
+      include: [{ // Include associated ProductImages
+        model: ProductImage,
+        as: 'images',
+        attributes: ['id', 'url']
+      }]
     });
 
     if (!product) {
@@ -60,10 +103,12 @@ router.get('/:id', async (req, res, next) => {
 // Suggests edits to the information for one product (Requires authentication)
 router.put('/:id', requireAuth, async (req, res, next) => {
   const { id } = req.params;
-  const { name, description, category, brand, model_number } = req.body;
+  const { name, description, category, brand, model_number, images } = req.body; // Accept images in the request
 
   try {
-    const product = await Product.findByPk(id);
+    const product = await Product.findByPk(id, {
+      include: [{ model: ProductImage, as: 'images' }] // Include images for deletion or update
+    });
 
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
@@ -78,7 +123,25 @@ router.put('/:id', requireAuth, async (req, res, next) => {
 
     await product.save();
 
-    return res.json(product);
+    // Handle product images
+    if (images) {
+      // Delete existing images
+      await ProductImage.destroy({ where: { product_id: id } });
+
+      // Add new images
+      const imageInstances = images.map((url) => ({
+        product_id: id,
+        url
+      }));
+      await ProductImage.bulkCreate(imageInstances);
+    }
+
+    // Fetch the updated product with associated images
+    const updatedProduct = await Product.findByPk(id, {
+      include: [{ model: ProductImage, as: 'images', attributes: ['id', 'url'] }]
+    });
+
+    return res.json(updatedProduct);
   } catch (err) {
     next(err);
   }

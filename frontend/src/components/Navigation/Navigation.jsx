@@ -1,9 +1,16 @@
-import { NavLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import './Navigation.css';
 
-function Navigation({ isLoaded }) {
+function Navigation() {
   const sessionUser = useSelector(state => state.session.user);
+  const navigate = useNavigate()
+
+  const handleClick = (e) => {
+    e.preventDefault();
+    console.log('Login button clicked');
+    navigate('/login')
+  }
 
   return (
     <nav>
@@ -13,7 +20,7 @@ function Navigation({ isLoaded }) {
         </li>
       </ul>
       <div className='Nav-Right'>
-        Login
+        <button onClick={(e) => handleClick(e)}>Login</button>
       </div>
     </nav>
   );
