@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { fetchProducts } from '../../store/products'; // Adjust import path as necessary
 import './Products.css'; // Add CSS for styling
 
@@ -9,6 +10,7 @@ function Products() {
   const dispatch = useDispatch();
   const [page, setPage] = useState({}); // Pagination state for each category
   const limit = 10; // Number of products to fetch per category
+  const navigate = useNavigate();
 
   const productsByCategory = useSelector((state) => state.products.productsByCategory);
 
@@ -49,6 +51,10 @@ function Products() {
     }
   };
 
+  const handleTileClick = (productId) => {
+    navigate(`/products/${productId}`);
+  }
+
   return (
     <div className="products-container">
       {categories.map((category) => (
@@ -60,7 +66,7 @@ function Products() {
           >
             {productsByCategory[category] &&
               Object.values(productsByCategory[category].products).map((product) => (
-                <div key={product.id} className="product-tile">
+                <div key={product.id} className="product-tile" onClick={() => handleTileClick(product.id)}>
                   <div className="product-image-placeholder">
                     <img className='product-img' src={product.images[0]?.url || 'placeholder.jpg'} alt={product.name} />
                   </div>

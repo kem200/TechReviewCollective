@@ -1,0 +1,22 @@
+.ProductPage-Main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+}
+
+.ProductPage-img {
+    display: flex;
+    width: 60vw;
+    height: fit-content;
+    border-radius: 1rem;
+    background: inherit;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    justify-content: center;
+}
+
+.product-header img {
+    height: 300px;
+    padding: 1rem;
+    object-fit: cover;
+}

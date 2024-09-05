@@ -1,4 +1,5 @@
 const LOAD_PRODUCTS = 'products/LOAD_PRODUCTS';
+const GET_PRODUCT = 'products/GET_PRODUCT';
 const ADD_PRODUCT = 'products/ADD_PRODUCT';
 const UPDATE_PRODUCT = 'products/UPDATE_PRODUCT';
 const DELETE_PRODUCT = 'products/DELETE_PRODUCT';
@@ -10,7 +11,12 @@ const loadProducts = (category, products, totalPages, currentPage) => ({
     products,
     totalPages,
     currentPage,
-  });
+});
+
+const getProduct = (product) => ({
+    type: GET_PRODUCT,
+    product,
+})
 
 const addProduct = (category, product) => ({
     type: ADD_PRODUCT,
@@ -33,29 +39,39 @@ const deleteProduct = (category, productId) => ({
 // Thunk to Fetch All Products with Pagination
 export const fetchProducts = (category = '', page = 1, limit = 20) => async (dispatch) => {
     const queryString = new URLSearchParams({
-      category, // If category is empty, it won't be included in the query
-      page,
-      limit,
+        category, // If category is empty, it won't be included in the query
+        page,
+        limit,
     }).toString();
 
     const response = await fetch(`/api/products?${queryString}`);
 
     if (response.ok) {
-      const data = await response.json();
+        const data = await response.json();
 
-      if (Array.isArray(data.products) && data.products.length > 0) { // Check if products is a non-empty array
-        dispatch(loadProducts(category, data.products, data.totalPages, data.currentPage));
-        return data.products;
-      } else {
-        // Do not dispatch anything if no new products are returned
-        console.warn(`No more products found for category: ${category}`);
-        return [];
-      }
+        if (Array.isArray(data.products) && data.products.length > 0) { // Check if products is a non-empty array
+            dispatch(loadProducts(category, data.products, data.totalPages, data.currentPage));
+            return data.products;
+        } else {
+            // Do not dispatch anything if no new products are returned
+            console.warn(`No more products found for category: ${category}`);
+            return [];
+        }
     } else {
-      console.error('Failed to fetch products:', response.status);
-      return null;
+        console.error('Failed to fetch products:', response.status);
+        return null;
     }
-  };
+};
+
+// Thunk to Fetch a Single Product
+export const fetchProduct = (productId) => async (dispatch) => {
+    const response = await fetch(`/api/products/${productId}`);
+
+    if (response.ok) {
+        const product = await response.json();
+        dispatch(getProduct(product));
+    }
+}
 
 // Thunk to Add a New Product
 export const createProduct = (productData) => async (dispatch) => {
@@ -98,99 +114,108 @@ export const removeProduct = (productId) => async (dispatch) => {
 
 const initialState = {
     productsByCategory: {}, // Products are now grouped by category
-  };
+    singleProduct: {},
+};
 
-  // Products Reducer
-  const productsReducer = (state = initialState, action) => {
+// Products Reducer
+const productsReducer = (state = initialState, action) => {
     switch (action.type) {
-      case LOAD_PRODUCTS: {
-        const { category, products, totalPages, currentPage } = action; // Destructure action payload
-        const newProducts = {};
+        case LOAD_PRODUCTS: {
+            const { category, products, totalPages, currentPage } = action; // Destructure action payload
+            const newProducts = {};
 
-        if (!Array.isArray(products)) {
-          console.error('Products data is not an array:', products);
-          return state; // Gracefully handle incorrect data
+            if (!Array.isArray(products)) {
+                console.error('Products data is not an array:', products);
+                return state; // Gracefully handle incorrect data
+            }
+
+            products.forEach((product) => {
+                newProducts[product.id] = product;
+            });
+
+            return {
+                ...state,
+                productsByCategory: {
+                    ...state.productsByCategory,
+                    [category]: {
+                        products: newProducts,
+                        totalPages,
+                        currentPage,
+                    },
+                },
+            };
         }
 
-        products.forEach((product) => {
-          newProducts[product.id] = product;
-        });
-
-        return {
-          ...state,
-          productsByCategory: {
-            ...state.productsByCategory,
-            [category]: {
-              products: newProducts,
-              totalPages,
-              currentPage,
-            },
-          },
-        };
-      }
-
-      case ADD_PRODUCT: {
-        const { category, product } = action; // Destructure action payload
-
-        // If no category exists, initialize it
-        if (!state.productsByCategory[category]) {
-          state.productsByCategory[category] = {
-            products: {},
-            totalPages: 1,
-            currentPage: 1,
-          };
+        case GET_PRODUCT: {
+            const { product } = action; // Destructure action payload
+            return {
+                ...state,
+                singleProduct: product,
+            };
         }
 
-        return {
-          ...state,
-          productsByCategory: {
-            ...state.productsByCategory,
-            [category]: {
-              ...state.productsByCategory[category],
-              products: { ...state.productsByCategory[category].products, [product.id]: product },
-            },
-          },
-        };
-      }
+        case ADD_PRODUCT: {
+            const { category, product } = action; // Destructure action payload
 
-      case UPDATE_PRODUCT: {
-        const { category, product } = action; // Destructure action payload
+            // If no category exists, initialize it
+            if (!state.productsByCategory[category]) {
+                state.productsByCategory[category] = {
+                    products: {},
+                    totalPages: 1,
+                    currentPage: 1,
+                };
+            }
 
-        return {
-          ...state,
-          productsByCategory: {
-            ...state.productsByCategory,
-            [category]: {
-              ...state.productsByCategory[category],
-              products: { ...state.productsByCategory[category].products, [product.id]: product },
-            },
-          },
-        };
-      }
+            return {
+                ...state,
+                productsByCategory: {
+                    ...state.productsByCategory,
+                    [category]: {
+                        ...state.productsByCategory[category],
+                        products: { ...state.productsByCategory[category].products, [product.id]: product },
+                    },
+                },
+            };
+        }
 
-      case DELETE_PRODUCT: {
-        const { category, productId } = action; // Destructure action payload
+        case UPDATE_PRODUCT: {
+            const { category, product } = action; // Destructure action payload
 
-        if (!state.productsByCategory[category]) return state; // Gracefully handle missing category
+            return {
+                ...state,
+                productsByCategory: {
+                    ...state.productsByCategory,
+                    [category]: {
+                        ...state.productsByCategory[category],
+                        products: { ...state.productsByCategory[category].products, [product.id]: product },
+                    },
+                },
+            };
+        }
 
-        const newProducts = { ...state.productsByCategory[category].products };
-        delete newProducts[productId];
+        case DELETE_PRODUCT: {
+            const { category, productId } = action; // Destructure action payload
 
-        return {
-          ...state,
-          productsByCategory: {
-            ...state.productsByCategory,
-            [category]: {
-              ...state.productsByCategory[category],
-              products: newProducts,
-            },
-          },
-        };
-      }
+            if (!state.productsByCategory[category]) return state; // Gracefully handle missing category
 
-      default:
-        return state;
+            const newProducts = { ...state.productsByCategory[category].products };
+            delete newProducts[productId];
+
+            return {
+                ...state,
+                productsByCategory: {
+                    ...state.productsByCategory,
+                    [category]: {
+                        ...state.productsByCategory[category],
+                        products: newProducts,
+                    },
+                },
+            };
+        }
+
+        default:
+            return state;
     }
-  };
+};
 
-  export default productsReducer;
+export default productsReducer;

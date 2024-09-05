@@ -39,6 +39,26 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+// GET /api/products/:productId
+// Returns the information for one product, including images
+router.get('/:productId', async (req, res, next) => {
+  const { productId } = req.params;
+
+  try {
+    const product = await Product.findByPk(productId, {
+      include: [{ model: ProductImage, as: 'images' }]
+    });
+
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    return res.json(product);
+  } catch (err) {
+    next(err);
+  }
+});
+
 // POST /api/products/
 // Creates a new product (Requires authentication)
 router.post('/', requireAuth, async (req, res, next) => {
