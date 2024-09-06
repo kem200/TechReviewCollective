@@ -9,7 +9,8 @@
     display: flex;
     width: 60vw;
     height: fit-content;
-    border-radius: 1rem;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
     background: inherit;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     justify-content: center;
@@ -19,4 +20,26 @@
     height: 300px;
     padding: 1rem;
     object-fit: cover;
+}
+
+.ProductPage-rating-header {
+    margin-top: .75rem;
+    border-bottom-left-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 58vw;
+    padding: 1rem;
+}
+
+.ProductPage-rating-header button {
+    background: #2704d7;
+    border: none;
+    border-radius: 5px;
+    padding: .5rem 1rem;
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
 }

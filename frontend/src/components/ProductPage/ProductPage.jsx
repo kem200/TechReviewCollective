@@ -37,6 +37,11 @@ function ProductPage() {
                     )}
                 </div>
             </div>
+            <div className='ProductPage-rating-header'>
+                <h2>Community Rating: 7.2</h2>
+                <p>15 Reviews</p>
+                <button>Post Review</button>
+            </div>
         </div>
     );
 }
