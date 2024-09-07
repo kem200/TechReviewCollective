@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { createProduct } from '../../store/products';
 import './NewProductForm.css';
@@ -10,6 +10,7 @@ function NewProductForm() {
     const [description, setDescription] = useState('');
     const [category, setCategory] = useState('');
     const [images, setImages] = useState('');
+    const [showSuccess, setShowSuccess] = useState(false);
 
     const dispatch = useDispatch();
 
@@ -23,7 +24,11 @@ function NewProductForm() {
             category,
             images: [images] // Assuming images is a single URL string
         };
-        await dispatch(createProduct(newProduct));
+        const response = await dispatch(createProduct(newProduct));
+        if (response) {
+            setShowSuccess(true);
+            setTimeout(() => setShowSuccess(false), 3000); // Hide after 3 seconds
+        }
     };
 
     return (
@@ -56,6 +61,7 @@ function NewProductForm() {
                 </label>
                 <button type="submit">Add Product</button>
             </form>
+            {showSuccess && <div className="success-popup">Product added successfully!</div>}
         </div>
     );
 }

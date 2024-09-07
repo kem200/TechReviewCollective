@@ -1,7 +1,7 @@
-import { useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
 import './Navigation.css';
-import { logout } from '../../store/session'; // Import the logout action
+import { logout } from '../../store/session';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 function Navigation() {
   const sessionUser = useSelector(state => state.session.user);
@@ -24,26 +24,27 @@ function Navigation() {
     navigate('/new-product');
   };
 
+  const handleHomeClick = (e) => {
+    e.preventDefault();
+    navigate('/');
+  }
+
   return (
     <nav>
-      <ul className="nav-left">
-        <li>
-          TechReviewCollective
-        </li>
-      </ul>
+      <img id='logo' src="/logo1.png" alt="TechReviewCollective" onClick={handleHomeClick}/>
       <div className='Nav-Right'>
         {sessionUser ? (
           <>
             <div className="dropdown">
+              <button onClick={handlePostProductClick} id='post-product-button'>Post Product</button>
               <button className="dropbtn">{sessionUser.username}</button>
               <div className="dropdown-content">
                 <a href="#" onClick={handleLogoutClick}>Logout</a>
               </div>
             </div>
-            <button onClick={handlePostProductClick}>Post Product</button>
           </>
         ) : (
-          <button onClick={handleLoginClick}>Login</button>
+          <button onClick={handleLoginClick} id='login-button'>Login</button>
         )}
       </div>
     </nav>
