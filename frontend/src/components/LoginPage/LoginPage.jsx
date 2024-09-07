@@ -28,7 +28,7 @@ function LoginPage() {
 
     return (
        <div className='LoginPage-Main'>
-            <h1>Login</h1>
+            <h1>Login to TechReviewCollective</h1>
             <form onSubmit={handleSubmit}>
                 <ul>
                     {errors.map((error, idx) => <li key={idx}>{error}</li>)}

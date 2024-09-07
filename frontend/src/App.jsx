@@ -5,8 +5,9 @@ import Navigation from './components/Navigation';
 import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import SignupPage from './components/SignupPage';
-import Products from './components/Products/';
+import Products from './components/Products';
 import ProductPage from './components/ProductPage';
+import NewProductForm from './components/NewProductForm';
 import * as sessionActions from './store/session';
 
 function Layout() {
@@ -51,6 +52,10 @@ const router = createBrowserRouter([
       {
         path: '/products/:productId',
         element: <ProductPage />,
+      },
+      {
+        path: '/new-product',
+        element: <NewProductForm />,
       }
     ]
   }
