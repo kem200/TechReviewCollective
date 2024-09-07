@@ -1,12 +1,13 @@
 const express = require('express');
-const { Product, ProductImage } = require('../../db/models');
+const { Product, ProductImage, Rating } = require('../../db/models');
 const { requireAuth, restoreUser } = require('../../utils/auth');
-const router = express.Router();
 const { Op } = require('sequelize');
 const sequelize = require('../../db/models').sequelize;
 
+const router = express.Router();
+
 // GET /api/products/
-// Returns the information for all products, including images
+// Returns the information for all products, including images and average rating
 router.get('/', async (req, res, next) => {
   const { category, search } = req.query; // Get category and search from query parameters
   const page = parseInt(req.query.page) || 1; // Current page, default is 1
@@ -32,18 +33,47 @@ router.get('/', async (req, res, next) => {
       limit: limit, // Limit the number of results per page
       offset: offset, // Skip the appropriate number of rows
       attributes: ['id', 'name', 'description', 'category', 'brand', 'model_number', 'createdAt', 'updatedAt'],
-      include: [{ // Include associated ProductImages
-        model: ProductImage,
-        as: 'images', // Alias for the association
-        attributes: ['id', 'url']
-      }],
+      include: [
+        { // Include associated ProductImages
+          model: ProductImage,
+          as: 'images', // Alias for the association
+          attributes: ['id', 'url']
+        },
+        { // Include associated Ratings
+          model: Rating,
+          as: 'ratings',
+          attributes: ['rating']
+        }
+      ]
+    });
+
+    // Calculate average rating for each product
+    const productsWithRatings = products.map(product => {
+      const ratings = product.ratings.map(r => r.rating);
+      const averageRating = ratings.length ? (ratings.reduce((acc, rating) => acc + rating, 0) / ratings.length) : null;
+
+      // Manually construct the response object
+      const productData = {
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        category: product.category,
+        brand: product.brand,
+        model_number: product.model_number,
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt,
+        images: product.images,
+        averageRating
+      };
+
+      return productData;
     });
 
     // Calculate total pages
     const totalPages = Math.ceil(count / limit);
 
     return res.json({
-      products,
+      products: productsWithRatings,
       totalPages,
       currentPage: page,
     });
@@ -53,20 +83,41 @@ router.get('/', async (req, res, next) => {
 });
 
 // GET /api/products/:productId
-// Returns the information for one product, including images
+// Returns the information for one product, including images and average rating
 router.get('/:productId', async (req, res, next) => {
   const { productId } = req.params;
 
   try {
     const product = await Product.findByPk(productId, {
-      include: [{ model: ProductImage, as: 'images' }]
+      include: [
+        { model: ProductImage, as: 'images' },
+        { model: Rating, as: 'ratings', attributes: ['rating'] }
+      ]
     });
 
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    return res.json(product);
+    // Calculate average rating for the product
+    const ratings = product.ratings.map(r => r.rating);
+    const averageRating = ratings.length ? (ratings.reduce((acc, rating) => acc + rating, 0) / ratings.length) : null;
+
+    // Manually construct the response object
+    const productData = {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      category: product.category,
+      brand: product.brand,
+      model_number: product.model_number,
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt,
+      images: product.images,
+      averageRating
+    };
+
+    return res.json(productData);
   } catch (err) {
     next(err);
   }

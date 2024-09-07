@@ -27,19 +27,28 @@
     border-bottom-left-radius: 1rem;
     border-bottom-right-radius: 1rem;
     display: flex;
-    justify-content: space-between;
     align-items: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 58vw;
     padding: 1rem;
 }
 
+.ProductPage-rating-header p {
+    margin-left: 1rem;
+    color: rgb(87, 87, 87);
+}
+
 .ProductPage-rating-header button {
     background: #2704d7;
     border: none;
-    border-radius: 5px;
+    border-radius: 1rem;
     padding: .5rem 1rem;
     color: white;
     font-size: 1rem;
     cursor: pointer;
+    margin-left: .5rem;
+}
+
+#rate-button {
+    margin-left: auto;
 }

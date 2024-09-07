@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { fetchProducts } from '../../store/products'; // Adjust import path as necessary
-import './Products.css'; // Add CSS for styling
+import { fetchProducts } from '../../store/products';
+import './Products.css';
 
-const categories = ['Smartphone', 'Laptop', 'Smartwatch', 'Tablet']; // Define categories
+const categories = ['Smartphone', 'Laptop', 'Smartwatch', 'Tablet'];
 
 function Products() {
   const dispatch = useDispatch();
-  const [page, setPage] = useState({}); // Pagination state for each category
-  const limit = 10; // Number of products to fetch per category
+  const [page, setPage] = useState({});
+  const limit = 10;
   const navigate = useNavigate();
 
   const productsByCategory = useSelector((state) => state.products.productsByCategory);
 
-  // Initialize page state for each category
+
   useEffect(() => {
     const initialPageState = {};
     categories.forEach((category) => {
@@ -23,11 +23,10 @@ function Products() {
     setPage(initialPageState);
   }, []);
 
-  // Fetch products for all categories
   useEffect(() => {
     categories.forEach((category) => {
-      if (page[category] === 1) { // Only fetch on initial load
-        dispatch(fetchProducts(category, page[category], limit)); // Fetch products for each category
+      if (page[category] === 1) {
+        dispatch(fetchProducts(category, page[category], limit));
       }
     });
   }, [dispatch, page, limit]);
@@ -36,7 +35,7 @@ function Products() {
   const handleScroll = (e, category) => {
     const { scrollLeft, scrollWidth, clientWidth } = e.target;
     if (scrollLeft + clientWidth >= scrollWidth - 10) {
-      const nextPage = page[category] + 1; // Calculate the next page
+      const nextPage = page[category] + 1;
 
       // Fetch more products when reaching the end of the scroll
       dispatch(fetchProducts(category, nextPage, limit)).then((fetchedProducts) => {
@@ -55,6 +54,12 @@ function Products() {
     navigate(`/products/${productId}`);
   }
 
+  const getRatingColor = (rating) => {
+    const green = Math.min(200, Math.max(0, (rating / 10) * 255));
+    const red = Math.min(255, Math.max(0, ((10 - rating) / 10) * 255));
+    return `rgb(${red}, ${green}, 0)`;
+};
+
   return (
     <div className="products-container">
       {categories.map((category) => (
@@ -65,21 +70,23 @@ function Products() {
             onScroll={(e) => handleScroll(e, category)}
           >
             {productsByCategory[category] &&
-              Object.values(productsByCategory[category].products).map((product) => (
-                <div key={product.id} className="product-tile" onClick={() => handleTileClick(product.id)}>
-                  <div className="product-image-placeholder">
-                    <img className='product-img' src={product.images[0]?.url || 'placeholder.jpg'} alt={product.name} />
-                  </div>
-                  {/* Product information */}
-                  <div className='wrapper'>
-                    <div className="product-info">
-                      {/* <div className="product-brand">{product.brand}</div> */}
-                      <div className="product-name">{product.name}</div>
+              Object.values(productsByCategory[category].products)
+                .sort((a, b) => b.averageRating - a.averageRating)
+                .map((product) => (
+                  <div key={product.id} className="product-tile" onClick={() => handleTileClick(product.id)}>
+                    <div className="product-image-placeholder">
+                      <img className='product-img' src={product.images[0]?.url || 'placeholder.jpg'} alt={product.name} />
                     </div>
-                    <div className="rating-placeholder">{product?.averageRating || "0.0"}</div>
+                    <div className='wrapper'>
+                      <div className="product-info">
+                        <div className="product-name">{product.name}</div>
+                      </div>
+                      <div className="rating-placeholder" style={{ color: getRatingColor(product.averageRating) }}>
+                        {product?.averageRating?.toFixed(1)}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
           </div>
         </div>
       ))}
