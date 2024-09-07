@@ -1,16 +1,28 @@
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import './Navigation.css';
+import { logout } from '../../store/session'; // Import the logout action
 
 function Navigation() {
   const sessionUser = useSelector(state => state.session.user);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const handleClick = (e) => {
+  const handleLoginClick = (e) => {
     e.preventDefault();
-    console.log('Login button clicked');
-    navigate('/login')
-  }
+    navigate('/login');
+  };
+
+  const handleLogoutClick = (e) => {
+    e.preventDefault();
+    dispatch(logout());
+    navigate('/');
+  };
+
+  const handlePostProductClick = (e) => {
+    e.preventDefault();
+    navigate('/new-product');
+  };
 
   return (
     <nav>
@@ -20,7 +32,19 @@ function Navigation() {
         </li>
       </ul>
       <div className='Nav-Right'>
-        <button onClick={(e) => handleClick(e)}>Login</button>
+        {sessionUser ? (
+          <>
+            <div className="dropdown">
+              <button className="dropbtn">{sessionUser.username}</button>
+              <div className="dropdown-content">
+                <a href="#" onClick={handleLogoutClick}>Logout</a>
+              </div>
+            </div>
+            <button onClick={handlePostProductClick}>Post Product</button>
+          </>
+        ) : (
+          <button onClick={handleLoginClick}>Login</button>
+        )}
       </div>
     </nav>
   );

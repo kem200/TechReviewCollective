@@ -8,6 +8,7 @@ import SignupPage from './components/SignupPage';
 import Products from './components/Products';
 import ProductPage from './components/ProductPage';
 import NewProductForm from './components/NewProductForm';
+import ProfilePage from './components/ProfilePage';
 import * as sessionActions from './store/session';
 
 function Layout() {
@@ -56,6 +57,10 @@ const router = createBrowserRouter([
       {
         path: '/new-product',
         element: <NewProductForm />,
+      },
+      {
+        path: '/profile',
+        element: <ProfilePage />,
       }
     ]
   }

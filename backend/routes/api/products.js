@@ -1,6 +1,6 @@
 const express = require('express');
 const { Product, ProductImage } = require('../../db/models');
-const { requireAuth } = require('../../utils/auth');
+const { requireAuth, restoreUser } = require('../../utils/auth');
 const router = express.Router();
 
 // GET /api/products/
@@ -61,7 +61,7 @@ router.get('/:productId', async (req, res, next) => {
 
 // POST /api/products/
 // Creates a new product (Requires authentication)
-router.post('/', requireAuth, async (req, res, next) => {
+router.post('/', restoreUser, requireAuth, async (req, res, next) => {
   const { name, description, category, brand, model_number, images } = req.body;
 
   try {

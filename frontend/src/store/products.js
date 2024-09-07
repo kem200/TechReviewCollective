@@ -1,8 +1,11 @@
+import { csrfFetch } from "./csrf";
+
 const LOAD_PRODUCTS = 'products/LOAD_PRODUCTS';
 const GET_PRODUCT = 'products/GET_PRODUCT';
 const ADD_PRODUCT = 'products/ADD_PRODUCT';
 const UPDATE_PRODUCT = 'products/UPDATE_PRODUCT';
 const DELETE_PRODUCT = 'products/DELETE_PRODUCT';
+
 
 // Action Creators
 const loadProducts = (category, products, totalPages, currentPage) => ({
@@ -44,7 +47,7 @@ export const fetchProducts = (category = '', page = 1, limit = 20) => async (dis
         limit,
     }).toString();
 
-    const response = await fetch(`/api/products?${queryString}`);
+    const response = await csrfFetch(`/api/products?${queryString}`);
 
     if (response.ok) {
         const data = await response.json();
@@ -65,7 +68,7 @@ export const fetchProducts = (category = '', page = 1, limit = 20) => async (dis
 
 // Thunk to Fetch a Single Product
 export const fetchProduct = (productId) => async (dispatch) => {
-    const response = await fetch(`/api/products/${productId}`);
+    const response = await csrfFetch(`/api/products/${productId}`);
 
     if (response.ok) {
         const product = await response.json();
@@ -75,7 +78,7 @@ export const fetchProduct = (productId) => async (dispatch) => {
 
 // Thunk to Add a New Product
 export const createProduct = (productData) => async (dispatch) => {
-    const response = await fetch('/api/products', {
+    const response = await csrfFetch('/api/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(productData),
@@ -83,7 +86,9 @@ export const createProduct = (productData) => async (dispatch) => {
 
     if (response.ok) {
         const newProduct = await response.json();
-        dispatch(addProduct(newProduct));
+        dispatch(addProduct(productData.category, newProduct)); // Pass the category and new product
+    } else {
+        console.error('Failed to create product:', response.status);
     }
 };
 
