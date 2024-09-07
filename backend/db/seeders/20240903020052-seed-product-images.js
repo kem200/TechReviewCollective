@@ -19,7 +19,7 @@ module.exports = {
       { product_id: 5, url: 'https://m.media-amazon.com/images/I/61f41zCQfKL.jpg' },
       { product_id: 6, url: 'https://cdn-dynmedia-1.microsoft.com/is/image/microsoftcorp/surface-pro-9-sizzel-most-powerful-pro_tbmnl_en-us?scl=1', },
       { product_id: 7, url: 'https://www.apple.com/newsroom/images/product/mac/standard/Apple-MacBook-Pro-M2-Pro-and-M2-Max-hero-230117_Full-Bleed-Image.jpg.large.jpg' },
-      { product_id: 8, url: 'https://i.dell.com/is/image/DellContent/content/dam/ss2/product-images/dell-client-products/notebooks/xps-notebooks/xps-15-9520/media-gallery/black/laptop-xps-9520-t-black-gallery-4.psd?fmt=pjpg&pscan=auto&scl=1&wid=3491&hei=2077&qlt=100,1&resMode=sharp2&size=3491,2077&chrss=full&imwidth=5000' },
+      { product_id: 8, url: 'https://m.media-amazon.com/images/I/719CAihgtTL.jpg' },
       { product_id: 9, url: 'https://www.techspot.com/images/products/2020/laptops/org/2023-12-18-product-2-j_1100.webp' },
       { product_id: 10, url: 'https://crdms.images.consumerreports.org/prod/products/cr/models/407606-smartwatches-apple-watch-series-8-gps-45mm-10032324.png' }
     ], { validate: true });  // Include validation to ensure data integrity
