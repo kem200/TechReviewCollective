@@ -1,6 +1,5 @@
-import React from 'react';
-import Products from '../Products/Products'; // Import the Product component
-import './LandingPage.css'; // Add CSS for styling if needed
+import Products from '../Products/Products';
+import './LandingPage.css'; 
 
 const LandingPage = () => {
   return (

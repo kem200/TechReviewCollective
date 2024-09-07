@@ -32,7 +32,7 @@ const SearchResultsPage = () => {
   return (
     <div className="search-results-page">
       <div className="search-results">
-        <h2>Search Results for "{searchQuery}"</h2>
+        <h2>Search Results for &apos;{searchQuery}&apos;</h2>
         {loading ? (
           <div className="spinner-container">
             <ClipLoader size={50} color={"#123abc"} loading={loading} />

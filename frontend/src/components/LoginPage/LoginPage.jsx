@@ -1,6 +1,6 @@
 import * as sessionActions from '../../store/session';
 import { useDispatch } from 'react-redux';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './LoginPage.css';
 

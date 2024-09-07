@@ -50,7 +50,7 @@ function ProductPage() {
     };
 
     if (isLoading) {
-        return <ClipLoader color="#ffffff" loading={isLoading} cssOverride={spinnerStyle} size={150} />;
+        return <ClipLoader color="#ffffff" loading={isLoading} size={150} />;
     }
 
     return (
