@@ -3,7 +3,7 @@
     text-align: center;
 }
 
-form {
+.LoginPage-Main form {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -17,8 +17,8 @@ form {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-form input[type="text"],
-form input[type="password"] {
+.LoginPage-Main form input[type="text"],
+.LoginPage-Main form input[type="password"] {
     box-sizing: border-box;
     flex: 1;
     width: 100%;
@@ -27,7 +27,7 @@ form input[type="password"] {
     border-radius: 4px;
 }
 
-form button {
+.LoginPage-Main form button {
     width: 100%;
     padding: 0.75rem;
     background-color: #007bff;
@@ -37,6 +37,6 @@ form button {
     cursor: pointer;
 }
 
-form button:hover {
+.LoginPage-Main form button:hover {
     background-color: #0056b3;
 }

@@ -2,20 +2,33 @@ const express = require('express');
 const { Product, ProductImage } = require('../../db/models');
 const { requireAuth, restoreUser } = require('../../utils/auth');
 const router = express.Router();
+const { Op } = require('sequelize');
+const sequelize = require('../../db/models').sequelize;
 
 // GET /api/products/
 // Returns the information for all products, including images
 router.get('/', async (req, res, next) => {
-  const { category } = req.query; // Get category from query parameters
+  const { category, search } = req.query; // Get category and search from query parameters
   const page = parseInt(req.query.page) || 1; // Current page, default is 1
   const limit = parseInt(req.query.limit) || 20; // Items per page, default is 20
   const offset = (page - 1) * limit; // Calculate the offset
 
   try {
-    const where = category ? { category } : {}; // Filter by category if provided
+    const where = {};
+
+    if (category) {
+      where.category = category;
+    }
+
+    if (search) {
+      // Determine the appropriate operator based on the database dialect
+      const isPostgres = sequelize.getDialect() === 'postgres';
+      const likeOperator = isPostgres ? Op.iLike : Op.like;
+      where.name = { [likeOperator]: `%${search}%` }; // Case-insensitive search by product name
+    }
 
     const { count, rows: products } = await Product.findAndCountAll({
-      where, // Apply the category filter
+      where, // Apply the category and search filter
       limit: limit, // Limit the number of results per page
       offset: offset, // Skip the appropriate number of rows
       attributes: ['id', 'name', 'description', 'category', 'brand', 'model_number', 'createdAt', 'updatedAt'],

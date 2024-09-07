@@ -12,6 +12,11 @@
     margin-bottom: 40px;
   }
 
+  .category-row h2 {
+    text-align: left!important;
+    color: rgb(7, 7, 7);
+  }
+
   .category-title {
     font-size: 24px;
     margin-bottom: 10px;

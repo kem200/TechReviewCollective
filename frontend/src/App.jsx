@@ -9,6 +9,7 @@ import Products from './components/Products';
 import ProductPage from './components/ProductPage';
 import NewProductForm from './components/NewProductForm';
 import ProfilePage from './components/ProfilePage';
+import SearchResultsPage from './components/SearchResultsPage'; // Import the SearchResultsPage
 import * as sessionActions from './store/session';
 
 function Layout() {
@@ -61,6 +62,10 @@ const router = createBrowserRouter([
       {
         path: '/profile',
         element: <ProfilePage />,
+      },
+      {
+        path: '/search', // Add the route for the SearchResultsPage
+        element: <SearchResultsPage />,
       }
     ]
   }

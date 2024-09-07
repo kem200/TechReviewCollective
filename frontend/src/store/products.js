@@ -5,6 +5,7 @@ const GET_PRODUCT = 'products/GET_PRODUCT';
 const ADD_PRODUCT = 'products/ADD_PRODUCT';
 const UPDATE_PRODUCT = 'products/UPDATE_PRODUCT';
 const DELETE_PRODUCT = 'products/DELETE_PRODUCT';
+const SEARCH_PRODUCTS = 'products/SEARCH_PRODUCTS';
 
 
 // Action Creators
@@ -39,6 +40,11 @@ const deleteProduct = (category, productId) => ({
     productId,
 });
 
+const searchProducts = (products) => ({
+    type: SEARCH_PRODUCTS,
+    products,
+});
+
 // Thunk to Fetch All Products with Pagination
 export const fetchProducts = (category = '', page = 1, limit = 20) => async (dispatch) => {
     const queryString = new URLSearchParams({
@@ -62,6 +68,21 @@ export const fetchProducts = (category = '', page = 1, limit = 20) => async (dis
         }
     } else {
         console.error('Failed to fetch products:', response.status);
+        return null;
+    }
+};
+
+// Thunk to Search for Products
+export const searchForProducts = (query) => async (dispatch) => {
+    const response = await csrfFetch(`/api/products?search=${query}`);
+
+    if (response.ok) {
+        const data = await response.json();
+        console.log(data)
+        dispatch(searchProducts(data.products));
+        return data.products;
+    } else {
+        console.error('Failed to search products:', response.status);
         return null;
     }
 };
@@ -118,8 +139,9 @@ export const removeProduct = (productId) => async (dispatch) => {
 };
 
 const initialState = {
-    productsByCategory: {}, // Products are now grouped by category
+    productsByCategory: {},
     singleProduct: {},
+    searchResults: [],
 };
 
 // Products Reducer
@@ -215,6 +237,13 @@ const productsReducer = (state = initialState, action) => {
                         products: newProducts,
                     },
                 },
+            };
+        }
+
+        case SEARCH_PRODUCTS: {
+            return {
+                ...state,
+                searchResults: action.products,
             };
         }
 

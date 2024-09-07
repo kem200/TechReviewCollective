@@ -32,9 +32,9 @@ function NewProductForm() {
     };
 
     return (
-        <div>
+        <div className='ProductForm-Main'>
             <h2>New Product Form</h2>
-            <form className='product-form' onSubmit={handleSubmit}>
+            <form className='new-product-form' onSubmit={handleSubmit}>
                 <label>
                     Brand:
                     <input type="text" name="brand" value={brand} onChange={(e) => setBrand(e.target.value)} />

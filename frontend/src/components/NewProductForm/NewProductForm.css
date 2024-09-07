@@ -1,17 +1,22 @@
-.product-form {
+.ProductForm-Main {
+    width: 50%;
+    margin: auto;
+}
+
+.new-product-form {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
 }
 
-.product-form label {
+.new-product-form label {
     display: flex;
     flex-direction: column;
     width: 100%;
 }
 
-.product-form input {
+.new-product-form input {
     width: 100%;
     padding: 8px;
     box-sizing: border-box;
@@ -19,7 +24,7 @@
     border-radius: 4px;
 }
 
-.product-form button {
+.new-product-form button {
     padding: 10px 20px;
     background-color: #4CAF50;
     color: white;
@@ -29,7 +34,7 @@
     margin-top: 10px;
 }
 
-.product-form button:hover {
+.new-product-form button:hover {
     background-color: #45a049;
 }
 
