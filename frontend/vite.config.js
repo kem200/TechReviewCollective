@@ -11,6 +11,9 @@ export default defineConfig(({ mode }) => ({
       failOnError: mode === "production"
     })
   ],
+  build: {
+    outDir: 'build' // Specify the output directory
+  },
   server: {
     proxy: {
       '/api': 'http://localhost:8000'
