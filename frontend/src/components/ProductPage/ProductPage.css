@@ -52,3 +52,24 @@
 #rate-button {
     margin-left: auto;
 }
+
+.ReviewTile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+}
+
+.ReviewTile {
+    display: flex;
+    border-radius: .5rem;
+    height: 3rem;
+    padding: 1rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 58vw;
+    align-items: center;
+}
+
+.review-rating {
+    margin-left: auto;
+}

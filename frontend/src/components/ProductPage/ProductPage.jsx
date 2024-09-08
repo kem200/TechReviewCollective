@@ -71,6 +71,17 @@ function ProductPage() {
                 <button id='rate-button' onClick={handleRateButtonClick}>Rate</button>
                 <button>Post Review</button>
             </div>
+            <h3>Reviews + Ratings</h3>
+            <div className='ReviewTile'>
+                <div className='ReviewTile-header'>
+                    <img src="" alt="Profile" />
+                    <h4>Username</h4>
+                </div>
+                <div className='ReviewTile-content'>
+                    <p>Review content</p>
+                </div>
+                <div className='review-rating'>9.0</div>
+            </div>
             <RatingModal
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
