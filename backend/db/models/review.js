@@ -29,10 +29,6 @@ module.exports = (sequelize, DataTypes) => {
         },
         onDelete: 'CASCADE'
       },
-      title: {
-        type: DataTypes.STRING(255),
-        allowNull: false
-      },
       content: {
         type: DataTypes.TEXT,
         allowNull: false
@@ -41,11 +37,6 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "Review",
-      defaultScope: {
-        attributes: {
-          exclude: ["createdAt", "updatedAt"]
-        }
-      }
     }
   );
   return Review;
