@@ -18,22 +18,22 @@ module.exports = {
       {
         product_id: 1,
         user_id: 2,
-        rating: 6, // Not too positive nor too critical
+        rating: 8, // Not too positive nor too critical
       },
       {
         product_id: 1,
         user_id: 3,
-        rating: 7, // Not too positive nor too critical
+        rating: 10, // Not too positive nor too critical
       },
       {
         product_id: 1,
         user_id: 4,
-        rating: 9, // Very positive review
+        rating: 10, // Very positive review
       },
       {
         product_id: 1,
         user_id: 5,
-        rating: 9, // Very positive review
+        rating: 10, // Very positive review
       },
       {
         product_id: 2,
