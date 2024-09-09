@@ -61,6 +61,7 @@
 }
 
 .ReviewTile {
+    margin-top: .75rem;
     display: flex;
     border-radius: .5rem;
     height: 3rem;
