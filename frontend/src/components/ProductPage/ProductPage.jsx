@@ -53,7 +53,11 @@ function ProductPage() {
     };
 
     if (isLoading) {
-        return <ClipLoader color="#ffffff" loading={isLoading} size={150} />;
+        return (
+            <div className="spinner-container">
+                <ClipLoader color="#ffffff" loading={isLoading} size={150} />
+            </div>
+        );
     }
 
     return (
