@@ -23,13 +23,14 @@
 }
 
 .ProductPage-rating-header {
+    box-sizing: border-box;
     margin-top: .75rem;
     border-bottom-left-radius: 1rem;
     border-bottom-right-radius: 1rem;
     display: flex;
     align-items: center;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 58vw;
+    width: 60vw;
     padding: 1rem;
 }
 
@@ -61,16 +62,21 @@
 }
 
 .ReviewTile {
+    box-sizing: border-box;
     margin-top: .75rem;
     display: flex;
     border-radius: .5rem;
-    height: 3rem;
+    height: 4rem;
     padding: 1rem;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    width: 58vw;
+    width: 60vw;
     align-items: center;
 }
 
 .review-rating {
     margin-left: auto;
+}
+
+#ProductPage-profile-img {
+    margin-right: 1rem;
 }

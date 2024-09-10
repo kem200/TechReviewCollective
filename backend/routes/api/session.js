@@ -62,8 +62,7 @@ router.get(
     if (user) {
       const safeUser = {
         id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        display_name: user.display_name,
         email: user.email,
         username: user.username,
       };

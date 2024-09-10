@@ -6,6 +6,7 @@ import { fetchProduct } from '../../store/products';
 import { fetchReviews } from '../../store/reviews';
 import { ClipLoader } from 'react-spinners';
 import RatingModal from './RatingModal';
+import ReviewModal from './ReviewModal';
 import { submitRating, resetRatingState } from '../../store/rating';
 
 function ProductPage() {
@@ -13,8 +14,10 @@ function ProductPage() {
     const product = useSelector((state) => state.products.singleProduct);
     const isLoading = useSelector((state) => state.products.isLoading);
     const reviews = useSelector(state => state.reviews.reviewsByProduct[productId]?.reviews || {});
+    const sessionUser = useSelector(state => state.session.user);
     const dispatch = useDispatch();
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
     useEffect(() => {
         dispatch(fetchProduct(productId));
@@ -23,12 +26,22 @@ function ProductPage() {
     }, [dispatch, productId]);
 
     const handleRateButtonClick = () => {
-        setIsModalOpen(true);
+        setIsRatingModalOpen(true);
     };
 
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
+    const handleReviewButtonClick = () => {
+        setIsReviewModalOpen(true);
+    };
+
+    const handleCloseRatingModal = () => {
+        setIsRatingModalOpen(false);
         dispatch(fetchProduct(productId));
+    };
+
+    const handleCloseReviewModal = () => {
+        setIsReviewModalOpen(false);
+        dispatch(fetchProduct(productId));
+        dispatch(fetchReviews(productId)); // Ensure reviews are re-fetched to get the latest data
     };
 
     const handleSubmitRating = async (rating) => {
@@ -36,7 +49,7 @@ function ProductPage() {
             const resultAction = await dispatch(submitRating({ productId, rating }));
             if (submitRating.fulfilled.match(resultAction)) {
                 console.log(`Submitted rating: ${rating}`);
-                setIsModalOpen(false);
+                setIsRatingModalOpen(false);
                 dispatch(fetchProduct(productId));
             } else {
                 console.error('Failed to submit rating:', resultAction.payload || resultAction.error);
@@ -51,6 +64,8 @@ function ProductPage() {
         const red = Math.min(255, Math.max(0, ((10 - rating) / 10) * 255));
         return `rgb(${red}, ${green}, 0)`;
     };
+
+    const userHasReviewed = Object.values(reviews).some(review => review.userId === sessionUser?.id);
 
     if (isLoading) {
         return (
@@ -76,14 +91,14 @@ function ProductPage() {
                 <h2>Community Rating: <span id='ProductPage-rating' style={{ color: getRatingColor(product.averageRating) }}>{product.averageRating?.toFixed(1)}</span></h2>
                 <p>{Object.keys(reviews).length} Reviews</p>
                 <button id='rate-button' onClick={handleRateButtonClick}>Rate</button>
-                <button>Post Review</button>
+                <button onClick={handleReviewButtonClick} disabled={userHasReviewed}>Post Review</button>
             </div>
             <h3>Reviews + Ratings</h3>
             {Object.values(reviews).map(review => (
                 <div key={review.id} className='ReviewTile'>
                     <div className='ReviewTile-header'>
-                        <img src="" alt="Profile" />
-                        <h4>{review.User.username}</h4>
+                        <img src="" alt="Profile" id='ProductPage-profile-img'/>
+                        <h4>{review.User?.display_name}</h4>
                     </div>
                     <div className='ReviewTile-content'>
                         <p>{review.content}</p>
@@ -92,9 +107,14 @@ function ProductPage() {
                 </div>
             ))}
             <RatingModal
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}
+                isOpen={isRatingModalOpen}
+                onClose={handleCloseRatingModal}
                 onSubmit={handleSubmitRating}
+                productId={productId}
+            />
+            <ReviewModal
+                isOpen={isReviewModalOpen}
+                onClose={handleCloseReviewModal}
                 productId={productId}
             />
         </div>

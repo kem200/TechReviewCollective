@@ -2,6 +2,7 @@ const express = require('express');
 const { Review, Product, User } = require('../../db/models');
 const { Op } = require('sequelize');
 const router = express.Router();
+const { requireAuth , restoreUser } = require('../../utils/auth');
 
 // Get all reviews for a specific product with pagination
 router.get('/product/:productId', async (req, res) => {
@@ -16,7 +17,7 @@ router.get('/product/:productId', async (req, res) => {
       limit,
       offset,
       include: [
-        { model: User, attributes: ['id', 'username'] },
+        { model: User, attributes: ['id', 'username', 'display_name'] },
         { model: Product, attributes: ['id', 'name'] }
       ]
     });
@@ -34,10 +35,16 @@ router.get('/product/:productId', async (req, res) => {
 // Get all reviews from a specific user
 router.get('/user/:userId', async (req, res) => {
   const { userId } = req.params;
+  const { productId } = req.query;
 
   try {
+    let whereClause = { user_id: userId };
+    if (productId) {
+      whereClause.product_id = productId;
+    }
+
     const reviews = await Review.findAll({
-      where: { user_id: userId },
+      where: whereClause,
       include: [
         { model: User, attributes: ['id', 'username'] },
         { model: Product, attributes: ['id', 'name'] }
@@ -51,11 +58,23 @@ router.get('/user/:userId', async (req, res) => {
 });
 
 // Create a review
-router.post('/', async (req, res) => {
-  const { product_id, user_id, title, content } = req.body;
+router.post('/', restoreUser, requireAuth, async (req, res) => {
+  const { product_id, content } = req.body;
+  const { user } = req;
+  const existingReview = await Review.findOne({
+    where: {
+      product_id,
+      user_id: user.id
+    }
+  });
 
+  if (existingReview) {
+    return res.status(400).json({ error: 'You have already reviewed this product' });
+  }
+
+  console.log(req.body)
   try {
-    const review = await Review.create({ product_id, user_id, title, content });
+    const review = await Review.create({ product_id, user_id: user.id, content });
     res.status(201).json(review);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -63,7 +82,7 @@ router.post('/', async (req, res) => {
 });
 
 // Update a review
-router.put('/:id', async (req, res) => {
+router.put('/:id', restoreUser, requireAuth, async (req, res) => {
   const { id } = req.params;
   const { title, content } = req.body;
 
@@ -75,7 +94,7 @@ router.put('/:id', async (req, res) => {
     }
 
     // Ensure the user is the owner of the review
-    if (review.user_id !== req.body.user_id) {
+    if (review.user_id !== req.user.id) {
       return res.status(403).json({ error: 'You are not authorized to update this review' });
     }
 
@@ -90,7 +109,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete a review
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', restoreUser, requireAuth, async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -101,7 +120,7 @@ router.delete('/:id', async (req, res) => {
     }
 
     // Ensure the user is the owner of the review
-    if (review.user_id !== req.body.user_id) {
+    if (review.user_id !== req.user.id) {
       return res.status(403).json({ error: 'You are not authorized to delete this review' });
     }
 

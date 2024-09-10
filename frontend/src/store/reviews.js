@@ -17,11 +17,6 @@ const loadReviews = (productId, reviews, totalPages, currentPage) => ({
     currentPage,
 });
 
-// const getReview = (review) => ({
-//     type: GET_REVIEW,
-//     review,
-// });
-
 const addReview = (productId, review) => ({
     type: ADD_REVIEW,
     productId,
@@ -66,8 +61,8 @@ export const fetchReviews = (productId, page = 1, limit = 20) => async (dispatch
 };
 
 // Thunk to Fetch All Reviews from a User
-export const fetchUserReviews = (userId) => async (dispatch) => {
-    const response = await csrfFetch(`/api/reviews/user/${userId}`);
+export const fetchUserReviews = (userId, productId) => async (dispatch) => {
+    const response = await csrfFetch(`/api/reviews/user/${userId}?productId=${productId}`);
 
     if (response.ok) {
         const data = await response.json();
@@ -81,6 +76,7 @@ export const fetchUserReviews = (userId) => async (dispatch) => {
 
 // Thunk to Create a Review
 export const createReview = (reviewData) => async (dispatch) => {
+    console.log(reviewData)
     const response = await csrfFetch('/api/reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

@@ -32,7 +32,7 @@ const SignupPage = () => {
 
     return (
         <div className="SignupPage-Main">
-            <h1>Signup</h1>
+            <h1>Signup to TechReviewCollective</h1>
             <form onSubmit={handleSubmit}>
                 {errors.length > 0 && (
                     <ul>

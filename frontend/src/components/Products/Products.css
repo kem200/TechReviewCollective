@@ -9,7 +9,8 @@
   }
 
   .category-row {
-    margin-bottom: 40px;
+    margin-bottom: 1.75rem;
+    margin: auto;
   }
 
   .category-row h2 {
@@ -49,7 +50,6 @@
     width: 20rem;
     margin-right: 15px;
     margin-top: .5rem;
-    /* background-color: #f9f9f9; */
     border: 1px solid #ddd;
     border-radius: 8px;
     overflow: hidden;
