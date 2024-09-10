@@ -26,6 +26,17 @@ function LoginPage() {
             });
     }
 
+    const handleDemoLogin = (e) => {
+        e.preventDefault();
+        setErrors([]);
+        return dispatch(sessionActions.login({ credential: 'demo', password: 'password' }))
+            .then(() => navigate('/'))
+            .catch(async (res) => {
+                const data = await res.json();
+                if (data && data.errors) setErrors(data.errors);
+            });
+    }
+
     return (
        <div className='LoginPage-Main'>
             <h1>Login to TechReviewCollective</h1>
@@ -48,6 +59,7 @@ function LoginPage() {
                     required
                 />
                 <button type='submit'>Log In</button>
+                <button type='button' onClick={handleDemoLogin}>Demo User</button>
             </form>
        </div>
     )
