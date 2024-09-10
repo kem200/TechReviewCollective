@@ -1,1 +1,38 @@
+.ProfilePage-Main {
+    padding: 1rem;
+}
 
+.Profile-Header {
+    padding: 1rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    margin: auto;
+    width: 60vw;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.Profile-Header p {
+    margin-left: 1rem;
+    margin-top: 0;
+    margin-bottom: 0;
+    color: rgb(25, 25, 25);
+}
+
+.Profile-Header h1 {
+    margin: 0 0 0 1rem;
+}
+
+#profile-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 1000px;
+    margin-right: 1rem;
+    object-fit: cover;
+}
+
+.bio {
+    padding: 1.5rem;
+    max-width: 30vw;
+    margin-left: auto;
+}

@@ -12,17 +12,23 @@ import { submitRating, resetRatingState } from '../../store/rating';
 function ProductPage() {
     const { productId } = useParams();
     const product = useSelector((state) => state.products.singleProduct);
-    const isLoading = useSelector((state) => state.products.isLoading);
     const reviews = useSelector(state => state.reviews.reviewsByProduct[productId]?.reviews || {});
     const sessionUser = useSelector(state => state.session.user);
     const dispatch = useDispatch();
     const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        dispatch(fetchProduct(productId));
-        dispatch(fetchReviews(productId));
-        dispatch(resetRatingState());
+        const fetchData = async () => {
+            setIsLoading(true);
+            await dispatch(fetchProduct(productId));
+            await dispatch(fetchReviews(productId));
+            dispatch(resetRatingState());
+            setIsLoading(false);
+        };
+
+        fetchData();
     }, [dispatch, productId]);
 
     const handleRateButtonClick = () => {
@@ -95,7 +101,7 @@ function ProductPage() {
             </div>
             <h3>Reviews + Ratings</h3>
             {Object.values(reviews).map(review => (
-                <div key={review.id} className='ReviewTile'>
+                <div key={review?.id} className='ReviewTile'>
                     <div className='ReviewTile-header'>
                         <img src="" alt="Profile" id='ProductPage-profile-img'/>
                         <h4>{review.User?.display_name}</h4>
