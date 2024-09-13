@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchProducts } from '../../store/products';
 import './Products.css';
 
-const categories = ['Smartphone', 'Laptop', 'Smartwatch', 'Tablet'];
+const categories = ['Smartphones', 'Laptops', 'Smartwatches', 'Tablets'];
 
 function Products() {
   const dispatch = useDispatch();
@@ -13,7 +13,6 @@ function Products() {
   const navigate = useNavigate();
 
   const productsByCategory = useSelector((state) => state.products.productsByCategory);
-
 
   useEffect(() => {
     const initialPageState = {};
@@ -58,38 +57,40 @@ function Products() {
     const green = Math.min(200, Math.max(0, (rating / 10) * 255));
     const red = Math.min(255, Math.max(0, ((10 - rating) / 10) * 255));
     return `rgb(${red}, ${green}, 0)`;
-};
+  };
 
   return (
     <div className="products-container">
-      {categories.map((category) => (
-        <div key={category} className="category-row">
-          <h2 className="category-title">{category}</h2>
-          <div
-            className="product-row"
-            onScroll={(e) => handleScroll(e, category)}
-          >
-            {productsByCategory[category] &&
-              Object.values(productsByCategory[category].products)
-                .sort((a, b) => b.averageRating - a.averageRating)
-                .map((product) => (
-                  <div key={product.id} className="product-tile" onClick={() => handleTileClick(product.id)}>
-                    <div className="product-image-placeholder">
-                      <img className='product-img' src={product.images[0]?.url || 'placeholder.jpg'} alt={product.name} />
-                    </div>
-                    <div className='wrapper'>
-                      <div className="product-info">
-                        <div className="product-name">{product.name}</div>
+      <div className='products'>
+        {categories.map((category) => (
+          <div key={category} className="category-row">
+            <h2 className="category-title">{category}</h2>
+            <div
+              className="product-row"
+              onScroll={(e) => handleScroll(e, category)}
+            >
+              {productsByCategory[category] &&
+                Object.values(productsByCategory[category].products)
+                  .sort((a, b) => b.averageRating - a.averageRating)
+                  .map((product) => (
+                    <div key={product.id} className="product-tile" onClick={() => handleTileClick(product.id)}>
+                      <div className="product-image-placeholder">
+                        <img className='product-img' src={product.images[0]?.url || 'placeholder.jpg'} alt={product.name} />
                       </div>
-                      <div className="rating-placeholder" style={{ color: getRatingColor(product.averageRating) }}>
-                        {product?.averageRating?.toFixed(1)}
+                      <div className='wrapper'>
+                        <div className="product-info">
+                          <div className="product-name">{product.name}</div>
+                        </div>
+                        <div className="rating-placeholder" style={{ color: getRatingColor(product.averageRating) }}>
+                          {product?.averageRating?.toFixed(1)}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 .products-container {
-    margin: auto;
-    max-width: 80vw;
+    width: 100%;
+    padding: 20px;
   }
 
   .wrapper {
@@ -86,4 +86,11 @@
     width: 4rem;
     background-color: rgb(255, 255, 255);
     border-radius: 1rem;
+  }
+
+  .spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; 
   }

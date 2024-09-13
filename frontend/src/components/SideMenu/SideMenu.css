@@ -1,0 +1,52 @@
+.side-menu {
+  width: 12vw;
+  min-width: 12vw;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  height: 100vh;
+  overflow-y: hidden; /* Hide scrollbar by default */
+  margin-right: 1rem;
+  margin-bottom: auto;
+  transition: overflow-y 0.3s; /* Smooth transition for scrollbar appearance */
+}
+
+.side-menu:hover {
+  overflow-y: auto; /* Show scrollbar on hover */
+}
+
+.side-menu-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.category-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.category-item {
+  margin-bottom: 10px;
+}
+
+.category-link {
+  text-decoration: none;
+  color: #555;
+  font-size: 16px;
+  padding: 8px 12px;
+  display: block;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.category-link:hover {
+  background-color: #f0f0f0;
+}
+
+.category-link.active {
+  background-color: #007bff;
+  color: white;
+}

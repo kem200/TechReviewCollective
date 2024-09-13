@@ -9,7 +9,8 @@ import Products from './components/Products';
 import ProductPage from './components/ProductPage';
 import NewProductForm from './components/NewProductForm';
 import ProfilePage from './components/ProfilePage';
-import SearchResultsPage from './components/SearchResultsPage'; // Import the SearchResultsPage
+import SearchResultsPage from './components/SearchResultsPage';
+import CategoryProducts from './components/CategoryProducts';
 import * as sessionActions from './store/session';
 
 function Layout() {
@@ -66,6 +67,14 @@ const router = createBrowserRouter([
       {
         path: '/search', // Add the route for the SearchResultsPage
         element: <SearchResultsPage />,
+      },
+      {
+        path: '/category/:categoryName',
+        element: <CategoryProducts />,
+      },
+      {
+        path: '*',
+        element: <h1>Not Found 404</h1>
       }
     ]
   }

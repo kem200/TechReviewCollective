@@ -4,12 +4,14 @@ import sessionReducer from './session';
 import productsReducer from './products';
 import ratingsReducer from './rating';
 import reviewsReducer from './reviews';
+import categoriesReducer from './categories';
 
 const rootReducer = combineReducers({
     session: sessionReducer,
     products: productsReducer,
     ratings: ratingsReducer,
-    reviews: reviewsReducer
+    reviews: reviewsReducer,
+    categories: categoriesReducer
 });
 
 let enhancer;

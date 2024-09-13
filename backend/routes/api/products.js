@@ -1,10 +1,11 @@
 const express = require('express');
-const { Product, ProductImage, Rating } = require('../../db/models');
+const { Product, ProductImage, Rating, Category } = require('../../db/models'); // Include Category model
 const { requireAuth, restoreUser } = require('../../utils/auth');
 const { Op } = require('sequelize');
 const sequelize = require('../../db/models').sequelize;
 
 const router = express.Router();
+
 
 // GET /api/products/
 // Returns the information for all products, including images and average rating
@@ -17,10 +18,6 @@ router.get('/', async (req, res, next) => {
   try {
     const where = {};
 
-    if (category) {
-      where.category = category;
-    }
-
     if (search) {
       // Determine the appropriate operator based on the database dialect
       const isPostgres = sequelize.getDialect() === 'postgres';
@@ -28,21 +25,33 @@ router.get('/', async (req, res, next) => {
       where.name = { [likeOperator]: `%${search}%` }; // Case-insensitive search by product name
     }
 
+    const isPostgres = sequelize.getDialect() === 'postgres';
+    const likeOperator = isPostgres ? Op.iLike : Op.like;
+
+    // Modify the categoryWhere to be case insensitive
+    const categoryWhere = category ? { name: { [likeOperator]: category } } : {};
+
     const { count, rows: products } = await Product.findAndCountAll({
-      where, // Apply the category and search filter
+      where, // Apply the search filter
       limit: limit, // Limit the number of results per page
       offset: offset, // Skip the appropriate number of rows
-      attributes: ['id', 'name', 'description', 'category', 'brand', 'model_number', 'createdAt', 'updatedAt'],
+      attributes: ['id', 'name', 'description', 'brand', 'model_number', 'createdAt', 'updatedAt'],
       include: [
-        { // Include associated ProductImages
+        {
           model: ProductImage,
           as: 'images', // Alias for the association
           attributes: ['id', 'url']
         },
-        { // Include associated Ratings
+        {
           model: Rating,
           as: 'ratings',
           attributes: ['rating']
+        },
+        {
+          model: Category,
+          as: 'category', // Alias for the association
+          where: categoryWhere, // Filter by category name here with case-insensitivity
+          attributes: ['id', 'name']
         }
       ]
     });
@@ -57,7 +66,7 @@ router.get('/', async (req, res, next) => {
         id: product.id,
         name: product.name,
         description: product.description,
-        category: product.category,
+        category: product.category.name, // Use the category name from the association
         brand: product.brand,
         model_number: product.model_number,
         createdAt: product.createdAt,
@@ -91,7 +100,8 @@ router.get('/:productId', async (req, res, next) => {
     const product = await Product.findByPk(productId, {
       include: [
         { model: ProductImage, as: 'images' },
-        { model: Rating, as: 'ratings', attributes: ['rating'] }
+        { model: Rating, as: 'ratings', attributes: ['rating'] },
+        { model: Category, as: 'category', attributes: ['name'] } // Include Category for category name
       ]
     });
 
@@ -108,7 +118,7 @@ router.get('/:productId', async (req, res, next) => {
       id: product.id,
       name: product.name,
       description: product.description,
-      category: product.category,
+      category: product.category ? product.category.name : null, // Use the category name from the Category table
       brand: product.brand,
       model_number: product.model_number,
       createdAt: product.createdAt,
@@ -133,11 +143,10 @@ router.post('/', restoreUser, requireAuth, async (req, res, next) => {
     const newProduct = await Product.create({
       name,
       description,
-      category,
+      category_id: category, // Use category_id instead of category name
       brand,
       model_number
     });
-
 
     if (images && images.length > 0) {
       const imageInstances = images.map((url) => ({
@@ -147,85 +156,15 @@ router.post('/', restoreUser, requireAuth, async (req, res, next) => {
       await ProductImage.bulkCreate(imageInstances);
     }
 
-    // Fetch the product with associated images
+    // Fetch the product with associated images and category name
     const productWithImages = await Product.findByPk(newProduct.id, {
-      include: [{ model: ProductImage, as: 'images', attributes: ['id', 'url'] }]
+      include: [
+        { model: ProductImage, as: 'images', attributes: ['id', 'url'] },
+        { model: Category, as: 'category', attributes: ['name'] }
+      ]
     });
 
     return res.status(201).json(productWithImages);
-  } catch (err) {
-    next(err);
-  }
-});
-
-// GET /api/products/:id
-// Returns the information for one product, including images
-router.get('/:id', async (req, res, next) => {
-  const { id } = req.params;
-
-  try {
-    const product = await Product.findByPk(id, {
-      attributes: ['id', 'name', 'description', 'category', 'brand', 'model_number', 'createdAt', 'updatedAt'],
-      include: [{ // Include associated ProductImages
-        model: ProductImage,
-        as: 'images',
-        attributes: ['id', 'url']
-      }]
-    });
-
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
-
-    return res.json(product);
-  } catch (err) {
-    next(err);
-  }
-});
-
-// PUT /api/products/:id
-// Suggests edits to the information for one product (Requires authentication)
-router.put('/:id', requireAuth, async (req, res, next) => {
-  const { id } = req.params;
-  const { name, description, category, brand, model_number, images } = req.body; // Accept images in the request
-
-  try {
-    const product = await Product.findByPk(id, {
-      include: [{ model: ProductImage, as: 'images' }] // Include images for deletion or update
-    });
-
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
-
-    // Update product details
-    product.name = name || product.name;
-    product.description = description || product.description;
-    product.category = category || product.category;
-    product.brand = brand || product.brand;
-    product.model_number = model_number || product.model_number;
-
-    await product.save();
-
-    // Handle product images
-    if (images) {
-      // Delete existing images
-      await ProductImage.destroy({ where: { product_id: id } });
-
-      // Add new images
-      const imageInstances = images.map((url) => ({
-        product_id: id,
-        url
-      }));
-      await ProductImage.bulkCreate(imageInstances);
-    }
-
-    // Fetch the updated product with associated images
-    const updatedProduct = await Product.findByPk(id, {
-      include: [{ model: ProductImage, as: 'images', attributes: ['id', 'url'] }]
-    });
-
-    return res.json(updatedProduct);
   } catch (err) {
     next(err);
   }
