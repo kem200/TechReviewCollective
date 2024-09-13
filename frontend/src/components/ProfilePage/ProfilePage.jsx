@@ -22,6 +22,8 @@ function ProfilePage() {
   const [isEditingProfile, setIsEditingProfile] = useState(false); // State to control profile editing mode
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [reviewToEdit, setReviewToEdit] = useState(null);
+  const [isUploading, setIsUploading] = useState(false); // State to track upload status
+  const [hasChanges, setHasChanges] = useState(false); // State to track if changes were made
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,9 +43,12 @@ function ProfilePage() {
     }
   }, [dispatch, user.id]);
 
-  const handleUpload = (file) => {
-    dispatch(uploadProfileImage(file));
-    setIsModalOpen(false);
+  const handleUpload = async (file) => {
+    setIsUploading(true);
+    setIsModalOpen(false); // Close the modal if it is open
+    await dispatch(uploadProfileImage(file));
+    await dispatch(restoreUser());
+    setIsUploading(false);
   };
 
   const handleDeleteProfileImage = () => {
@@ -56,6 +61,14 @@ function ProfilePage() {
     await dispatch(updateUserInfo({ display_name: editName, bio: editBio }));
     await dispatch(restoreUser());
     setIsEditingProfile(false);
+    setHasChanges(false);
+  };
+
+  const handleCancelEdit = () => {
+    setEditName(user.display_name);
+    setEditBio(user.bio || '');
+    setIsEditingProfile(false);
+    setHasChanges(false);
   };
 
   const handleDeleteAccount = () => {
@@ -74,6 +87,11 @@ function ProfilePage() {
     setIsReviewModalOpen(false);
   };
 
+  const handleInputChange = (setter) => (e) => {
+    setter(e.target.value);
+    setHasChanges(true);
+  };
+
   if (isLoading) {
     return (
       <div className="spinner-container">
@@ -88,7 +106,11 @@ function ProfilePage() {
     <div className="ProfilePage-Main">
       <div className="Profile-Header">
         <div className="Profile-Image-Container">
-          <img src={user?.profileImageUrl || '/profile.jpg'} alt="Profile" className="profile-img" />
+          {isUploading ? (
+            <ClipLoader color="blue" size={50} />
+          ) : (
+            <img src={user?.profile_picture || '/profile.jpg'} alt="Profile" className="profile-img" />
+          )}
         </div>
 
         <div className="Profile-Info">
@@ -97,14 +119,14 @@ function ProfilePage() {
               <input
                 type="text"
                 value={editName}
-                onChange={(e) => setEditName(e.target.value)}
+                onChange={handleInputChange(setEditName)}
                 maxLength={30}
                 autoFocus
                 className="edit-input"
               />
               <textarea
                 value={editBio}
-                onChange={(e) => setEditBio(e.target.value)}
+                onChange={handleInputChange(setEditBio)}
                 maxLength={150}
                 className="edit-bio"
               />
@@ -125,13 +147,17 @@ function ProfilePage() {
           {isEditingProfile ? (
             <>
               <button onClick={() => setIsModalOpen(true)} className="action-btn">Upload Picture</button>
-              <button onClick={handleSaveChanges} className="save-changes-btn">Save Changes</button>
+              {hasChanges ? (
+                <button onClick={handleSaveChanges} className="save-changes-btn">Save Changes</button>
+              ) : (
+                <button onClick={handleCancelEdit} className="cancel-btn">Cancel</button>
+              )}
               <button onClick={handleDeleteProfileImage} className="delete-picture-btn">Delete Picture</button>
               <button onClick={handleDeleteAccount} className="delete-account-btn">Delete Account</button>
             </>
           ) : (
             <button className="edit-profile-btn" onClick={() => setIsEditingProfile(true)}>
-              <FaPencilAlt style={{marginRight: '10px'}}/> Edit Profile
+              <FaPencilAlt style={{ marginRight: '10px' }} /> Edit Profile
             </button>
           )}
         </div>

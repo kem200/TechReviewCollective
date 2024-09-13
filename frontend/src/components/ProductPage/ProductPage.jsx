@@ -4,16 +4,18 @@ import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchProduct } from '../../store/products';
 import { fetchReviews } from '../../store/reviews';
+import { fetchUserRating } from '../../store/rating';
 import { ClipLoader } from 'react-spinners';
 import RatingModal from './RatingModal';
 import ReviewModal from './ReviewModal';
-import { submitRating, resetRatingState } from '../../store/rating';
+import { submitRating } from '../../store/rating';
 
 function ProductPage() {
     const { productId } = useParams();
     const product = useSelector((state) => state.products.singleProduct);
     const reviews = useSelector(state => state.reviews.reviewsByProduct[productId]?.reviews || {});
     const sessionUser = useSelector(state => state.session.user);
+    const userRating = useSelector(state => state.ratings.userRating);
     const dispatch = useDispatch();
     const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
@@ -26,7 +28,7 @@ function ProductPage() {
             setIsLoading(true);
             await dispatch(fetchProduct(productId));
             await dispatch(fetchReviews(productId));
-            dispatch(resetRatingState());
+            await dispatch(fetchUserRating(productId)); // Fetch user's rating for the product
             setIsLoading(false);
         };
 
@@ -44,6 +46,7 @@ function ProductPage() {
     const handleCloseRatingModal = () => {
         setIsRatingModalOpen(false);
         dispatch(fetchProduct(productId));
+        dispatch(fetchReviews(productId)); // Refetch reviews to get the latest data
     };
 
     const handleCloseReviewModal = () => {
@@ -59,6 +62,7 @@ function ProductPage() {
                 console.log(`Submitted rating: ${rating}`);
                 setIsRatingModalOpen(false);
                 dispatch(fetchProduct(productId));
+                dispatch(fetchReviews(productId)); // Refetch reviews to get the latest data
             } else {
                 console.error('Failed to submit rating:', resultAction.payload || resultAction.error);
             }
@@ -73,7 +77,7 @@ function ProductPage() {
         return `rgb(${red}, ${green}, 0)`;
     };
 
-    const userHasReviewed = Object.values(reviews).some(review => review.userId === sessionUser?.id);
+    const userHasReviewed = Object.values(reviews).some(review => review.user_id === sessionUser?.id);
 
     const handleExpandClick = (reviewId) => {
         setExpandedReviews(prevState => ({
@@ -104,7 +108,7 @@ function ProductPage() {
     if (isLoading) {
         return (
             <div className="spinner-container">
-                <ClipLoader color="#blue" loading={isLoading} size={50} />
+                <ClipLoader color="#black" loading={isLoading} size={50} />
             </div>
         );
     }
@@ -124,8 +128,12 @@ function ProductPage() {
             <div className='ProductPage-rating-header'>
                 <h2>Community Rating: <span id='ProductPage-rating' style={{ color: getRatingColor(product.averageRating) }}>{product.averageRating?.toFixed(1)}</span></h2>
                 <p>{Object.keys(reviews).length} Reviews</p>
-                <button id='rate-button' onClick={handleRateButtonClick}>Rate</button>
-                <button onClick={handleReviewButtonClick} disabled={userHasReviewed}>Post Review</button>
+                <button id='rate-button' onClick={handleRateButtonClick}>
+                    {userRating ? 'Update Rating' : 'Rate'}
+                </button>
+                <button onClick={handleReviewButtonClick}>
+                    {userHasReviewed ? 'Edit Review' : 'Post Review'}
+                </button>
             </div>
             <div className='review-sort-menu'>
                 <h3>Reviews + Ratings</h3>
@@ -143,7 +151,7 @@ function ProductPage() {
                 <div key={review?.id} className={`ReviewTile ${expandedReviews[review.id] ? 'expanded' : ''}`}>
                     <div className='wrapper'>
                         <div className='ReviewTile-header'>
-                            <img src={'/profile.jpg'} alt="Profile" id='ProductPage-profile-img' />
+                            <img src={review.User?.profile_picture || '/profile.jpg'} alt="Profile" id='ProductPage-profile-img' />
                             <h4>{review.User?.display_name}</h4>
                         </div>
                         <div className='ReviewTile-content'>

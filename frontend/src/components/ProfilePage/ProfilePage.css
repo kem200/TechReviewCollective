@@ -191,8 +191,37 @@
     width: 150px;
     text-align: center;
     margin-top: 1rem;
-  }
-  
-  .ProfilePage-Main .edit-review-btn:hover {
+}
+
+.ProfilePage-Main .edit-review-btn:hover {
     background-color: #0056b3;
-  }
+}
+
+/* New styles for Save Changes and Cancel buttons */
+.ProfilePage-Main .save-changes-btn {
+    background-color: transparent;
+    color: #28a745;
+    border: 1px solid #28a745;
+}
+
+.ProfilePage-Main .save-changes-btn:hover {
+    background-color: #28a745;
+    color: white;
+}
+
+.ProfilePage-Main .cancel-btn {
+    background-color: transparent;
+    color: #555;
+    border: 1px solid #ddd;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    width: 150px;
+    text-align: center;
+}
+
+.ProfilePage-Main .cancel-btn:hover {
+    background-color: #f5f5f5;
+    color: #333;
+}

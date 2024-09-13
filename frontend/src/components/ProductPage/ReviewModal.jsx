@@ -30,7 +30,7 @@ function ReviewModal({ isOpen, onClose, productId }) {
         if (isOpen) {
             fetchReviews();
         }
-    }, [dispatch, sessionUser.id, productId, isOpen]);
+    }, [dispatch, sessionUser?.id, productId, isOpen]);
 
     if (!isOpen) return null;
 
@@ -38,7 +38,7 @@ function ReviewModal({ isOpen, onClose, productId }) {
         event.preventDefault();
         try {
             if (userReview) {
-                await dispatch(editReview(userReview.id, { product_id: productId, content, rating }));
+                await dispatch(editReview(userReview?.id, { product_id: productId, content, rating }));
             } else {
                 await dispatch(createReview({ product_id: productId, content, rating }));
             }
@@ -51,7 +51,7 @@ function ReviewModal({ isOpen, onClose, productId }) {
 
     const handleDelete = async () => {
         try {
-            await dispatch(removeReview(userReview.id, productId));
+            await dispatch(removeReview(userReview?.id, productId));
             onClose();
             dispatch(fetchReviews(productId)); // Ensure reviews are re-fetched to get the latest data
         } catch (error) {

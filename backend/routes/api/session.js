@@ -71,6 +71,7 @@ router.get('/', async (req, res) => {
         email: user.email,
         bio: user.bio,
         username: user.username,
+        profile_picture: user.profile_picture,
         profileImageUrl: profileImage ? profileImage.url : null,
         createdAt: user.createdAt,
       };

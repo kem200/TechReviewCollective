@@ -18,7 +18,7 @@ router.get('/product/:productId', async (req, res) => {
       limit,
       offset,
       include: [
-        { model: User, attributes: ['id', 'username', 'display_name'] },
+        { model: User, attributes: ['id', 'username', 'display_name', 'profile_picture'] },
         { model: Product, attributes: ['id', 'name'] },
       ],
     });

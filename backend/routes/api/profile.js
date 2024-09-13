@@ -24,6 +24,11 @@ router.post('/upload-profile', restoreUser, requireAuth, singleMulterUpload('pro
       url: imageUrl,
     });
 
+    // Update the user's profile_picture column
+    const user = await User.findByPk(userId);
+    user.profile_picture = imageUrl;
+    await user.save();
+
     // Send back the URL of the uploaded image
     res.status(200).json({ imageUrl: profileImage.url });
   } catch (error) {
@@ -65,6 +70,11 @@ router.delete('/delete-profile-image', restoreUser, requireAuth, async (req, res
 
       await deleteFileFromS3(key); // Delete the file from S3
       await profileImage.destroy(); // Delete the profile image record from the table
+
+      // Update the user's profile_picture column
+      const user = await User.findByPk(userId);
+      user.profile_picture = null;
+      await user.save();
 
       return res.json({ message: 'Profile image deleted successfully.' });
     } else {

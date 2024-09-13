@@ -1,54 +1,42 @@
-.products-container {
-    width: 100%;
+.products-container-category {
     padding: 20px;
-  }
+}
 
-  .wrapper {
+.products-container-category .wrapper {
     display: flex;
     align-items: center;
-  }
+}
 
-  .category-row {
+.products-container-category .category-row {
     margin-bottom: 1.75rem;
     margin: auto;
-  }
+}
 
-  .category-row h2 {
+.products-container-category .category-row h2 {
     text-align: left!important;
     color: rgb(7, 7, 7);
-  }
+}
 
-  .category-title {
+.products-container-category .category-title {
     font-size: 24px;
     margin-bottom: 10px;
-  }
+}
 
-  .product-row {
-    display: flex;
-    overflow-x: auto;
+.products-container-category .product-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    gap: 15px;
     padding-bottom: 10px;
-    scrollbar-width: thin; /* For Firefox */
-  }
+}
 
-  .product-row::-webkit-scrollbar {
-    height: 8px; /* For Chrome, Safari, and Opera */
-  }
-
-  .product-row::-webkit-scrollbar-thumb {
-    background-color: #888;
-    border-radius: 10px;
-  }
-
-  .product-img {
+.products-container-category .product-img {
     height: 150px;
     object-fit: cover;
     margin-bottom: 10px;
-  }
+}
 
-  .product-tile {
+.products-container-category .product-tile {
     flex: 0 0 auto;
-    width: 20rem;
-    margin-right: 15px;
     margin-top: .5rem;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -56,41 +44,51 @@
     text-align: center;
     padding: 10px;
     transition: transform 0.3s ease-in-out;
-  }
+}
 
-  .product-tile:hover {
+.products-container-category .product-tile:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     cursor: pointer;
-  }
+}
 
-  .product-info {
+.products-container-category .product-info {
     font-size: 16px;
     margin-left: 1rem;
     text-align: left;
-  }
+}
 
-  .product-name {
+.products-container-category .product-name {
     font-weight: bold;
-  }
+}
 
-  .product-brand {
+.products-container-category .product-brand {
     color: #555;
     margin-bottom: 5px;
-  }
+}
 
-  .rating-placeholder {
+.products-container-category .rating-placeholder {
     font-size: 24px;
     color: rgb(33, 160, 33);
     margin-left: auto;
     width: 4rem;
     background-color: rgb(255, 255, 255);
     border-radius: 1rem;
-  }
+}
 
-  .spinner-container {
+.products-container-category .spinner-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; 
-  }
+    height: 100vh;
+}
+
+.products-container-category #add-product-button {
+    background-color: rgb(26, 26, 166);
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: .5rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
