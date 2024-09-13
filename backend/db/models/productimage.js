@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
         key: 'id' // key in the target model that we're referencing
       }
     },
-    url: DataTypes.STRING
+    url: DataTypes.STRING(500)
   }, {
     sequelize,
     modelName: 'ProductImage',

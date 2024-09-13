@@ -24,7 +24,7 @@ module.exports = {
         onDelete: 'SET NULL'
       },
       url: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(500)
       },
       createdAt: {
         allowNull: false,
