@@ -2,10 +2,12 @@ import './ProfilePage.css';
 import { fetchUserReviews } from '../../store/reviews';
 import { uploadProfileImage, deleteProfileImage } from '../../store/profileImage';
 import { updateUserInfo, deleteUserAccount } from '../../store/user';
+import { restoreUser } from '../../store/session';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ClipLoader from 'react-spinners/ClipLoader';
 import UploadModal from './UploadModal';
+import ReviewModal from './ReviewModal';
 import { FaPencilAlt } from 'react-icons/fa'; // Import pencil icon from react-icons
 
 function ProfilePage() {
@@ -19,6 +21,8 @@ function ProfilePage() {
   const [editName, setEditName] = useState(user.display_name);
   const [editBio, setEditBio] = useState(user.bio || '');
   const [isEditingProfile, setIsEditingProfile] = useState(false); // State to control profile editing mode
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviewToEdit, setReviewToEdit] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,15 +53,26 @@ function ProfilePage() {
     }
   };
 
-  const handleSaveChanges = () => {
-    dispatch(updateUserInfo({ display_name: editName, bio: editBio }));
-    setIsEditingProfile(false); // Exit edit mode after saving
+  const handleSaveChanges = async () => {
+    await dispatch(updateUserInfo({ display_name: editName, bio: editBio }));
+    await dispatch(restoreUser());
+    setIsEditingProfile(false);
   };
 
   const handleDeleteAccount = () => {
     if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
       dispatch(deleteUserAccount());
     }
+  };
+
+  const handleEditReview = (review) => {
+    setReviewToEdit(review);
+    setIsReviewModalOpen(true);
+  };
+
+  const handleReviewUpdate = async () => {
+    await dispatch(fetchUserReviews(user.id));
+    setIsReviewModalOpen(false);
   };
 
   if (isLoading) {
@@ -132,6 +147,7 @@ function ProfilePage() {
           <div className="review-content">
             <p>{review.content}</p>
           </div>
+          <button className="edit-review-btn" onClick={() => handleEditReview(review)}>Edit Review</button>
         </div>
       ))}
 
@@ -140,6 +156,15 @@ function ProfilePage() {
         onClose={() => setIsModalOpen(false)}
         onUpload={handleUpload}
       />
+
+      {isReviewModalOpen && (
+        <ReviewModal
+          isOpen={isReviewModalOpen}
+          onClose={() => setIsReviewModalOpen(false)}
+          productId={reviewToEdit?.product_id}
+          onReviewUpdate={handleReviewUpdate}
+        />
+      )}
     </div>
   );
 }

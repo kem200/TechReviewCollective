@@ -108,8 +108,10 @@ export const createProduct = (productData) => async (dispatch) => {
     if (response.ok) {
         const newProduct = await response.json();
         dispatch(addProduct(productData.category, newProduct)); // Pass the category and new product
+        return newProduct; // Return the new product data
     } else {
-        console.error('Failed to create product:', response.status);
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to create product');
     }
 };
 

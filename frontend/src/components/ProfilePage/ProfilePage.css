@@ -179,3 +179,20 @@
     color: #444;
     line-height: 1.5;
 }
+
+.ProfilePage-Main .edit-review-btn {
+    background-color: #1e45a0;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 150px;
+    text-align: center;
+    margin-top: 1rem;
+  }
+  
+  .ProfilePage-Main .edit-review-btn:hover {
+    background-color: #0056b3;
+  }
