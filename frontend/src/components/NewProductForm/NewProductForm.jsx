@@ -141,7 +141,7 @@ function NewProductForm() {
           />
           <span>
             Note: The model number is usually found on the product box or the device itself.
-            If you can't find the model number, use the product name instead.
+            If you can&apos;t find the model number, use the product name instead.
           </span>
         </label>
 
