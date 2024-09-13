@@ -5,14 +5,14 @@
   border-radius: 8px;
   padding: 20px;
   height: 100vh;
-  overflow-y: hidden; /* Hide scrollbar by default */
+  overflow-y: hidden; 
   margin-right: 1rem;
   margin-bottom: auto;
-  transition: overflow-y 0.3s; /* Smooth transition for scrollbar appearance */
+  transition: overflow-y 0.3s;
 }
 
 .side-menu:hover {
-  overflow-y: auto; /* Show scrollbar on hover */
+  overflow-y: auto;
 }
 
 .side-menu-title {

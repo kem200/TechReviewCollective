@@ -38,19 +38,18 @@ function NewProductForm() {
     const value = e.target.value;
     setCategory(value);
 
-    // Find the matching category in the filtered list
+
     const selectedCategory = categories.find((cat) => cat.name === value);
     if (selectedCategory) {
-      setCategoryId(selectedCategory.id); // Set the category ID
+      setCategoryId(selectedCategory.id);
     } else {
-      setCategoryId(null); // Reset if no matching category is found
+      setCategoryId(null);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if a valid category ID is selected
     if (!categoryId) {
       alert('Please select a valid category from the dropdown.');
       return;
@@ -60,14 +59,14 @@ function NewProductForm() {
       brand,
       name,
       model_number: modelNumber,
-      category: categoryId, // Send category ID
-      images: [images], // Assuming images is a single URL string
+      category: categoryId,
+      images: [images],
     };
 
     const response = await dispatch(createProduct(newProduct));
     if (response) {
       setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000); // Hide after 3 seconds
+      setTimeout(() => setShowSuccess(false), 3000);
     }
   };
 

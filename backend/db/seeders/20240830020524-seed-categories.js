@@ -59,7 +59,6 @@ module.exports = {
       { name: 'Fitness Trackers' },
       { name: 'Smart Glasses' },
       { name: 'Smart TVs' },
-      { name: 'Home Theater Systems' },
       { name: 'External Hard Drives' },
       { name: 'Solid-State Drives (SSD)' },
       { name: 'USB Flash Drives' },

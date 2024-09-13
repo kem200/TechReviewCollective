@@ -8,7 +8,7 @@ function CategoryProducts() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { categoryName } = useParams();
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(1); // Start at page 1
     const limit = 20;
     const [isLoading, setIsLoading] = useState(true);
 
@@ -32,8 +32,12 @@ function CategoryProducts() {
         return `rgb(${red}, ${green}, 0)`;
     };
 
+    const handleLoadMore = () => {
+        setPage((prevPage) => prevPage + 1); // Increment the page to load more products
+    };
+
     // Render the spinner while loading
-    if (isLoading) {
+    if (isLoading && page === 1) { // Show spinner only if loading the first page
         return (
             <div className="spinner-container">
                 <ClipLoader color="blue" size={50} />
@@ -76,6 +80,13 @@ function CategoryProducts() {
                             </div>
                         </div>
                     ))}
+            </div>
+
+            {/* Load More Button */}
+            <div className="load-more-container">
+                <button className="load-more-button" onClick={handleLoadMore} disabled={isLoading}>
+                    {isLoading ? 'Loading...' : 'Load More'}
+                </button>
             </div>
         </div>
     );
