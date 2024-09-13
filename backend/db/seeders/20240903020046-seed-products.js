@@ -17,8 +17,6 @@ module.exports = {
         category_id: 1,
         brand: 'Apple',
         model_number: 'MQ9R3LL/A',
-        createdAt: new Date(),
-        updatedAt: new Date()
       },
       {
         name: 'Samsung Galaxy S23 Ultra',
@@ -26,8 +24,6 @@ module.exports = {
         category_id: 1,
         brand: 'Samsung',
         model_number: 'SM-S918BZKEXAA',
-        createdAt: new Date(),
-        updatedAt: new Date()
       },
       {
         name: 'Google Pixel 7 Pro',
@@ -35,8 +31,6 @@ module.exports = {
         category_id: 1,
         brand: 'Google',
         model_number: 'GA03461-US',
-        createdAt: new Date(),
-        updatedAt: new Date()
       },
       {
         name: 'Apple iPad Pro 12.9-inch (6th Generation)',
@@ -44,8 +38,6 @@ module.exports = {
         category_id: 11,
         brand: 'Apple',
         model_number: 'MNXT3LL/A',
-        createdAt: new Date(),
-        updatedAt: new Date()
       },
       {
         name: 'Samsung Galaxy Tab S8 Ultra',
@@ -53,8 +45,6 @@ module.exports = {
         category_id: 11,
         brand: 'Samsung',
         model_number: 'SM-X900NZAAXAR',
-        createdAt: new Date(),
-        updatedAt: new Date()
       },
       {
         name: 'Microsoft Surface Pro 9',
@@ -62,8 +52,6 @@ module.exports = {
         category_id: 11,
         brand: 'Microsoft',
         model_number: 'QEZ-00001',
-        createdAt: new Date(),
-        updatedAt: new Date()
       },
       {
         name: 'Apple MacBook Pro 16-inch (2023)',
@@ -71,8 +59,6 @@ module.exports = {
         category_id: 2,
         brand: 'Apple',
         model_number: 'MK1H3LL/A',
-        createdAt: new Date(),
-        updatedAt: new Date()
       },
       {
         name: 'Dell XPS 15 (9520)',
@@ -80,8 +66,6 @@ module.exports = {
         category_id: 2,
         brand: 'Dell',
         model_number: 'XPS9520-8417SLV-PUS',
-        createdAt: new Date(),
-        updatedAt: new Date()
       },
       {
         name: 'HP Spectre x360 14',
@@ -89,8 +73,6 @@ module.exports = {
         category_id: 2,
         brand: 'HP',
         model_number: '14-ea1047nr',
-        createdAt: new Date(),
-        updatedAt: new Date()
       },
       {
         name: 'Apple Watch Series 8',
@@ -98,8 +80,6 @@ module.exports = {
         category_id: 12,
         brand: 'Apple',
         model_number: 'MNP13LL/A',
-        createdAt: new Date(),
-        updatedAt: new Date()
       },
     ], { validate: true });  // Use validation
   },
