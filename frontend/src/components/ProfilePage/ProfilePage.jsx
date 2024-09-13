@@ -150,7 +150,7 @@ function ProfilePage() {
               {hasChanges ? (
                 <button onClick={handleSaveChanges} className="save-changes-btn">Save Changes</button>
               ) : (
-                <button onClick={handleCancelEdit} className="cancel-btn">Cancel</button>
+                <button onClick={handleCancelEdit} className="cancel-btn">Close</button>
               )}
               <button onClick={handleDeleteProfileImage} className="delete-picture-btn">Delete Picture</button>
               <button onClick={handleDeleteAccount} className="delete-account-btn">Delete Account</button>
