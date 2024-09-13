@@ -36,6 +36,7 @@ router.get('/product/:productId', async (req, res) => {
 router.get('/user/:userId', async (req, res) => {
   const { userId } = req.params;
   const { productId } = req.query;
+  console.log(userId)
 
   try {
     let whereClause = { user_id: userId };

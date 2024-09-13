@@ -14,37 +14,47 @@ const isProduction = environment === 'production';
 const app = express();
 
 app.use(morgan('dev'));
-
 app.use(cookieParser());
-app.use(express.json());
+
+
+// Increase the payload size limit to handle file uploads
+app.use(express.urlencoded({ extended: false, limit: '10mb' })); // Increase limit as needed
+app.use(express.json({ limit: '10mb' })); // Increase limit as needed
 
 // Security Middleware
 if (!isProduction) {
-    // enable cors only in development
-    app.use(cors());
-  }
+  app.use(cors());
+}
 
-  // helmet helps set a variety of headers to better secure your app
-  app.use(
-    helmet.crossOriginResourcePolicy({
-      policy: "cross-origin"
-    })
-  );
+// helmet helps set a variety of headers to better secure your app
+app.use(
+  helmet.crossOriginResourcePolicy({
+    policy: "cross-origin"
+  })
+);
 
-  // Set the _csrf token and create req.csrfToken method
-  app.use(
-    csurf({
-      cookie: {
-        secure: isProduction,
-        sameSite: isProduction && "Lax",
-        httpOnly: true
-      }
-    })
-  );
+// CSRF Protection Middleware
+app.use(
+  csurf({
+    cookie: {
+      secure: isProduction,
+      sameSite: isProduction && "Lax",
+      httpOnly: true
+    }
+  })
+);
 
+// Add routes handling file uploads (before JSON body parsing)
+app.use('/api/profile', require('./routes/api/profile')); // Use multer middleware for this route
 
-app.use(routes); // Connect all the routes
+// Add body parsing middleware after file upload routes
+// app.use(express.urlencoded({ extended: false }));
+// app.use(express.json());
 
+// Connect all other routes
+app.use(routes); // Connect all the remaining routes
+
+// Error handling middlewares (unchanged)
 // Catch unhandled requests and forward to error handler.
 app.use((_req, _res, next) => {
   const err = new Error("The requested resource couldn't be found.");
@@ -78,7 +88,5 @@ app.use((err, _req, res, _next) => {
     stack: isProduction ? null : err.stack
   });
 });
-// ...
-
 
 module.exports = app;

@@ -61,18 +61,25 @@ export const fetchReviews = (productId, page = 1, limit = 20) => async (dispatch
 };
 
 // Thunk to Fetch All Reviews from a User
-export const fetchUserReviews = (userId, productId) => async (dispatch) => {
-    const response = await csrfFetch(`/api/reviews/user/${userId}?productId=${productId}`);
+export const fetchUserReviews = (userId, productId = null) => async (dispatch) => {
+    let url = `/api/reviews/user/${userId}`; // Base URL
+
+    // Add productId to the URL if it's provided
+    if (productId) {
+      url += `?productId=${productId}`;
+    }
+
+    const response = await csrfFetch(url); // Use the constructed URL
 
     if (response.ok) {
-        const data = await response.json();
-        dispatch(loadUserReviews(userId, data));
-        return data;
+      const data = await response.json();
+      dispatch(loadUserReviews(userId, data)); // Dispatch the action to load reviews
+      return data;
     } else {
-        console.error('Failed to fetch user reviews:', response.status);
-        return null;
+      console.error('Failed to fetch user reviews:', response.status);
+      return null;
     }
-};
+  };
 
 // Thunk to Create a Review
 export const createReview = (reviewData) => async (dispatch) => {

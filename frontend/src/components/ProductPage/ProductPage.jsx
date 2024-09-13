@@ -76,7 +76,7 @@ function ProductPage() {
     if (isLoading) {
         return (
             <div className="spinner-container">
-                <ClipLoader color="#blue" loading={isLoading} size={150} />
+                <ClipLoader color="#blue" loading={isLoading} size={50} />
             </div>
         );
     }

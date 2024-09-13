@@ -1,5 +1,8 @@
 .ProfilePage-Main {
     padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .Profile-Header {
@@ -36,3 +39,24 @@
     max-width: 30vw;
     margin-left: auto;
 }
+
+.ProfilePage-review-tile {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 1rem;
+    margin-top: .75rem;
+    width: 60vw;
+}
+
+.ProfilePage-review-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+  }

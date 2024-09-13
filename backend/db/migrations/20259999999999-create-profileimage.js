@@ -6,50 +6,45 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 module.exports = {
-  async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Products', {
+  async up (queryInterface, Sequelize) {
+    await queryInterface.createTable('ProfileImages', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      name: {
-        type: Sequelize.STRING,
-        unique: true
-      },
-      description: {
-        type: Sequelize.TEXT
-      },
-      category_id: {
+      userId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'Categories',
+          model: 'Users',
           key: 'id'
         },
         onDelete: 'CASCADE'
       },
-      brand: {
-        type: Sequelize.STRING
-      },
-      model_number: {
-        type: Sequelize.STRING,
-        unique: true
+      url: {
+        type: Sequelize.STRING(500),
+        allowNull: false,
+        validate: {
+          isUrl: true
+        }
       },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW  // Ensure consistent default value
+        defaultValue: Sequelize.NOW
       },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW  // Ensure consistent default value
+        defaultValue: Sequelize.NOW
       }
     }, options);
   },
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Products', options);
+
+  async down (queryInterface, Sequelize) {
+    options.tableName = 'ProfileImages';
+    await queryInterface.dropTable(options);
   }
 };

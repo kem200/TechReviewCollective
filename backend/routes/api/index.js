@@ -5,6 +5,7 @@ const usersRouter = require('./users.js');
 const productsRouter = require('./products.js');
 const ratingsRouter = require('./ratings.js');
 const reviewsRouter = require('./reviews.js');
+const profileRouter = require('./profile.js');
 const { restoreUser } = require("../../utils/auth.js");
 
 // Connect restoreUser middleware to the API router
@@ -21,5 +22,7 @@ router.use('/products', productsRouter);
 router.use('/ratings', ratingsRouter);
 
 router.use('/reviews', reviewsRouter);
+
+router.use('/profile', profileRouter);
 
 module.exports = router;
