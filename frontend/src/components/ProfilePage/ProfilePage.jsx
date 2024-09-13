@@ -14,7 +14,6 @@ function ProfilePage() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.session.user);
   const userReviews = useSelector((state) => state.reviews.userReviews[user.id]);
-  const profileImageState = useSelector((state) => state.profileImage);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -89,7 +88,7 @@ function ProfilePage() {
     <div className="ProfilePage-Main">
       <div className="Profile-Header">
         <div className="Profile-Image-Container">
-          <img src={profileImageState?.imageUrl || '/profile.jpg'} alt="Profile" className="profile-img" />
+          <img src={user?.profileImageUrl || '/profile.jpg'} alt="Profile" className="profile-img" />
         </div>
 
         <div className="Profile-Info">

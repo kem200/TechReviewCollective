@@ -190,6 +190,14 @@ const reviewsReducer = (state = initialState, action) => {
         case UPDATE_REVIEW: {
             const { productId, review } = action;
 
+            if (!state.reviewsByProduct[productId]) {
+                state.reviewsByProduct[productId] = {
+                    reviews: {},
+                    totalPages: 1,
+                    currentPage: 1,
+                };
+            }
+
             return {
                 ...state,
                 reviewsByProduct: {

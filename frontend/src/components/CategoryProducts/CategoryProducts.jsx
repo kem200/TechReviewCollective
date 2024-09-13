@@ -40,7 +40,7 @@ function CategoryProducts() {
     if (isLoading && page === 1) { // Show spinner only if loading the first page
         return (
             <div className="spinner-container">
-                <ClipLoader color="blue" size={50} />
+                <ClipLoader color="black" size={50} />
             </div>
         );
     }
