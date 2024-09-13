@@ -28,6 +28,55 @@
     border-radius: 4px;
 }
 
+.password-container {
+    position: relative;
+    width: 100%;
+}
+
+.password-container input {
+    width: calc(100% - 50px);
+}
+
+.show-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #007bff;
+}
+
+.check-icon {
+    position: absolute;
+    right: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #28a745;
+    font-size: 1rem;
+}
+
+.password-hint,
+.password-match {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.password-hint.valid {
+    color: #28a745;
+}
+
+.password-hint.invalid {
+    color: #dc3545;
+}
+
+.password-match.match {
+    color: #28a745;
+}
+
+.password-match.no-match {
+    color: #dc3545;
+}
+
 .SignupPage-Main form button {
     width: 100%;
     padding: 0.75rem;
@@ -40,4 +89,10 @@
 
 .SignupPage-Main form button:hover {
     background-color: #0056b3;
+}
+
+.error-list {
+    color: #dc3545;
+    list-style-type: none;
+    padding: 0;
 }

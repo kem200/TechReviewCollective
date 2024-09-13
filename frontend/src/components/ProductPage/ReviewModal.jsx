@@ -7,6 +7,7 @@ function ReviewModal({ isOpen, onClose, productId }) {
     const dispatch = useDispatch();
     const [content, setContent] = useState('');
     const [rating, setRating] = useState('');
+    const [charCount, setCharCount] = useState(0);
     const [userReview, setUserReview] = useState(null);
     const sessionUser = useSelector(state => state.session.user);
 
@@ -18,9 +19,11 @@ function ReviewModal({ isOpen, onClose, productId }) {
             if (reviewForProduct) {
                 setContent(reviewForProduct.content);
                 setRating(reviewForProduct.rating);
+                setCharCount(reviewForProduct.content.length);
             } else {
                 setContent('');
                 setRating('');
+                setCharCount(0);
             }
         };
 
@@ -56,6 +59,11 @@ function ReviewModal({ isOpen, onClose, productId }) {
         }
     };
 
+    const handleContentChange = (e) => {
+        setContent(e.target.value);
+        setCharCount(e.target.value.length);
+    };
+
     return (
         <div className="modal-overlay">
             <div className="modal-content">
@@ -65,21 +73,11 @@ function ReviewModal({ isOpen, onClose, productId }) {
                         Review:
                         <textarea
                             value={content}
-                            onChange={(e) => setContent(e.target.value)}
+                            onChange={handleContentChange}
+                            maxLength={1000}
                             required
                         />
-                    </label>
-                    <label>
-                        Rating: <span style={{ fontStyle: 'italic' }}>Optional</span>
-                        <input
-                            type="number"
-                            name="rating"
-                            min="1"
-                            max="10"
-                            placeholder='1-10'
-                            value={rating}
-                            onChange={(e) => setRating(e.target.value)}
-                        />
+                        <div className="char-count">{charCount}/1000</div>
                     </label>
                     <div className="modal-buttons">
                         <button type="submit">{userReview ? 'Update' : 'Submit'}</button>

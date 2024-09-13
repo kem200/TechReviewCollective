@@ -1,5 +1,5 @@
 const express = require('express');
-const { Review, Product, User } = require('../../db/models');
+const { Review, Product, User, Rating } = require('../../db/models');
 const { Op } = require('sequelize');
 const router = express.Router();
 const { requireAuth , restoreUser } = require('../../utils/auth');
@@ -12,20 +12,46 @@ router.get('/product/:productId', async (req, res) => {
   const offset = (page - 1) * limit;
 
   try {
+    // Fetch reviews with related User and Product data
     const reviews = await Review.findAndCountAll({
       where: { product_id: productId },
       limit,
       offset,
       include: [
         { model: User, attributes: ['id', 'username', 'display_name'] },
-        { model: Product, attributes: ['id', 'name'] }
-      ]
+        { model: Product, attributes: ['id', 'name'] },
+      ],
+    });
+
+    // Extract user IDs and product IDs from the reviews
+    const userIds = reviews.rows.map((review) => review.user_id);
+    const productIds = reviews.rows.map((review) => review.product_id);
+
+    // Fetch corresponding ratings for the given product and user IDs
+    const ratings = await Rating.findAll({
+      where: {
+        product_id: productIds,
+        user_id: userIds,
+      },
+    });
+
+    // Map ratings to their corresponding reviews
+    const reviewsWithRatings = reviews.rows.map((review) => {
+      const rating = ratings.find(
+        (r) => r.product_id === review.product_id && r.user_id === review.user_id
+      );
+
+      // Return the review object with the rating attached, if available
+      return {
+        ...review.toJSON(), // Convert Sequelize instance to plain object
+        rating: rating ? rating.rating : null, // Attach rating or set to null if not found
+      };
     });
 
     res.json({
-      reviews: reviews.rows,
+      reviews: reviewsWithRatings,
       totalPages: Math.ceil(reviews.count / limit),
-      currentPage: page
+      currentPage: page,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

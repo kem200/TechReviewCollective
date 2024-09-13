@@ -18,6 +18,8 @@ function ProductPage() {
     const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [expandedReviews, setExpandedReviews] = useState({});
+    const [sortOrder, setSortOrder] = useState('recent');
 
     useEffect(() => {
         const fetchData = async () => {
@@ -73,6 +75,32 @@ function ProductPage() {
 
     const userHasReviewed = Object.values(reviews).some(review => review.userId === sessionUser?.id);
 
+    const handleExpandClick = (reviewId) => {
+        setExpandedReviews(prevState => ({
+            ...prevState,
+            [reviewId]: !prevState[reviewId]
+        }));
+    };
+
+    const handleSortChange = (e) => {
+        setSortOrder(e.target.value);
+    };
+
+    const sortedReviews = Object.values(reviews).sort((a, b) => {
+        switch (sortOrder) {
+            case 'highest':
+                return b.rating - a.rating;
+            case 'lowest':
+                return a.rating - b.rating;
+            case 'recent':
+                return new Date(b.createdAt) - new Date(a.createdAt);
+            case 'oldest':
+                return new Date(a.createdAt) - new Date(b.createdAt);
+            default:
+                return 0;
+        }
+    });
+
     if (isLoading) {
         return (
             <div className="spinner-container">
@@ -84,7 +112,7 @@ function ProductPage() {
     return (
         <div className='ProductPage-Main'>
             <div className='product-header'>
-                <h1>{product.name}</h1>
+                <h1>{product.brand} {product.name}</h1>
                 <div className='ProductPage-img'>
                     {product.images && product.images.length > 0 ? (
                         <img src={product.images[0].url} alt={product.name} />
@@ -99,17 +127,38 @@ function ProductPage() {
                 <button id='rate-button' onClick={handleRateButtonClick}>Rate</button>
                 <button onClick={handleReviewButtonClick} disabled={userHasReviewed}>Post Review</button>
             </div>
-            <h3>Reviews + Ratings</h3>
-            {Object.values(reviews).map(review => (
-                <div key={review?.id} className='ReviewTile'>
-                    <div className='ReviewTile-header'>
-                        <img src="" alt="Profile" id='ProductPage-profile-img'/>
-                        <h4>{review.User?.display_name}</h4>
+            <div className='review-sort-menu'>
+                <h3>Reviews + Ratings</h3>
+                <div className='sort-container'>
+                    <label htmlFor='sort-reviews'>Sort by: </label>
+                    <select id='sort-reviews' value={sortOrder} onChange={handleSortChange}>
+                        <option value='recent'>Recent to Oldest</option>
+                        <option value='oldest'>Oldest to Recent</option>
+                        <option value='highest'>Highest to Lowest</option>
+                        <option value='lowest'>Lowest to Highest</option>
+                    </select>
+                </div>
+            </div>
+            {sortedReviews.map(review => (
+                <div key={review?.id} className={`ReviewTile ${expandedReviews[review.id] ? 'expanded' : ''}`}>
+                    <div className='wrapper'>
+                        <div className='ReviewTile-header'>
+                            <img src={'/profile.jpg'} alt="Profile" id='ProductPage-profile-img' />
+                            <h4>{review.User?.display_name}</h4>
+                        </div>
+                        <div className='ReviewTile-content'>
+                            <p id='review-content'>{review.content}</p>
+                            {review.content.length > 100 && (
+                                <button className='expand-button' onClick={() => handleExpandClick(review.id)}>
+                                    {expandedReviews[review.id] ? 'Show Less' : 'Show More'}
+                                </button>
+                            )}
+                        </div>
+                        <div className='review-rating' style={{ color: getRatingColor(review.rating) }}>
+                            {review.rating?.toFixed(1)}
+                        </div>
                     </div>
-                    <div className='ReviewTile-content'>
-                        <p>{review.content}</p>
-                    </div>
-                    <div className='review-rating'>{review.rating}</div>
+                    <span>{new Date(review.createdAt).toLocaleDateString()}</span>
                 </div>
             ))}
             <RatingModal

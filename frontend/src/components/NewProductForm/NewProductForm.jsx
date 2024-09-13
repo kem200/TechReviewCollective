@@ -8,8 +8,8 @@ function NewProductForm() {
   const [brand, setBrand] = useState('');
   const [name, setName] = useState('');
   const [modelNumber, setModelNumber] = useState('');
-  const [category, setCategory] = useState(''); // Category name input field
-  const [categoryId, setCategoryId] = useState(null); // Category ID to send to backend
+  const [category, setCategory] = useState('');
+  const [categoryId, setCategoryId] = useState(null);
   const [images, setImages] = useState('');
   const [showSuccess, setShowSuccess] = useState(false);
   const [filteredCategories, setFilteredCategories] = useState([]);
@@ -124,7 +124,7 @@ function NewProductForm() {
         type="text"
         name="category"
         value={category}
-        onChange={handleCategoryChange} // Use new handler
+        onChange={handleCategoryChange}
         list="category-options"
         placeholder="Select or type a category"
         required

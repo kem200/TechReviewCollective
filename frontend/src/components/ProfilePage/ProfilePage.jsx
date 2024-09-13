@@ -1,19 +1,24 @@
 import './ProfilePage.css';
 import { fetchUserReviews } from '../../store/reviews';
-import { uploadProfileImage } from '../../store/profileImage'; // Import the thunk for uploading images
+import { uploadProfileImage, deleteProfileImage } from '../../store/profileImage';
+import { updateUserInfo, deleteUserAccount } from '../../store/user';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ClipLoader from 'react-spinners/ClipLoader';
 import UploadModal from './UploadModal';
+import { FaPencilAlt } from 'react-icons/fa'; // Import pencil icon from react-icons
 
 function ProfilePage() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.session.user);
+  const userReviews = useSelector((state) => state.reviews.userReviews[user.id]);
+  const profileImageState = useSelector((state) => state.profileImage);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const userReviews = useSelector((state) => state.reviews.userReviews[user.id]);
-  const profileImageState = useSelector((state) => state.profileImage); // Get the upload state from Redux
+  const [editName, setEditName] = useState(user.display_name);
+  const [editBio, setEditBio] = useState(user.bio || '');
+  const [isEditingProfile, setIsEditingProfile] = useState(false); // State to control profile editing mode
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,8 +39,25 @@ function ProfilePage() {
   }, [dispatch, user.id]);
 
   const handleUpload = (file) => {
-    dispatch(uploadProfileImage(file)); // Dispatch the thunk to upload the file
-    setIsModalOpen(false); // Close the modal after starting the upload
+    dispatch(uploadProfileImage(file));
+    setIsModalOpen(false);
+  };
+
+  const handleDeleteProfileImage = () => {
+    if (window.confirm('Are you sure you want to delete your profile picture?')) {
+      dispatch(deleteProfileImage());
+    }
+  };
+
+  const handleSaveChanges = () => {
+    dispatch(updateUserInfo({ display_name: editName, bio: editBio }));
+    setIsEditingProfile(false); // Exit edit mode after saving
+  };
+
+  const handleDeleteAccount = () => {
+    if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+      dispatch(deleteUserAccount());
+    }
   };
 
   if (isLoading) {
@@ -48,36 +70,71 @@ function ProfilePage() {
 
   if (error) return <p>{error}</p>;
 
-  if (!userReviews || Object.keys(userReviews).length === 0) {
-    return <p>No reviews found for this user.</p>;
-  }
-
   return (
     <div className="ProfilePage-Main">
-      <div className='Profile-Header'>
-        <img src={profileImageState?.imageUrl || '/profile.jpg'} alt="Profile" id='profile-img' />
-        <div className='profile-details'>
-          <h1>{user.display_name}</h1>
-          <p>{Object.keys(userReviews).length} Reviews</p>
-          <p>4 Products Posted</p>
+      <div className="Profile-Header">
+        <div className="Profile-Image-Container">
+          <img src={profileImageState?.imageUrl || '/profile.jpg'} alt="Profile" className="profile-img" />
         </div>
-        <div className='bio'>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Minus modi repellendus et ullam laudantium explicabo quasi sit similique perferendis inventore nobis exercitationem, beatae dicta dignissimos corporis esse. Laudantium, quia totam.
+
+        <div className="Profile-Info">
+          {isEditingProfile ? (
+            <>
+              <input
+                type="text"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                maxLength={30}
+                autoFocus
+                className="edit-input"
+              />
+              <textarea
+                value={editBio}
+                onChange={(e) => setEditBio(e.target.value)}
+                maxLength={150}
+                className="edit-bio"
+              />
+              <p className="member-since">Member Since: {new Date(user.createdAt).toLocaleDateString(undefined, { year: 'numeric' })}</p>
+              <p>{Object.keys(userReviews).length} Reviews</p>
+            </>
+          ) : (
+            <>
+              <h1>{user.display_name}</h1>
+              <p className="member-since">Member Since: {new Date(user.createdAt).toLocaleDateString(undefined, { year: 'numeric' })}</p>
+              <p>{Object.keys(userReviews).length} Reviews</p>
+              <p className="bio-text">{editBio || 'Add a bio...'}</p>
+            </>
+          )}
         </div>
-        <button onClick={() => setIsModalOpen(true)}>Upload Picture</button>
+
+        <div className="Profile-Actions">
+          {isEditingProfile ? (
+            <>
+              <button onClick={() => setIsModalOpen(true)} className="action-btn">Upload Picture</button>
+              <button onClick={handleSaveChanges} className="save-changes-btn">Save Changes</button>
+              <button onClick={handleDeleteProfileImage} className="delete-picture-btn">Delete Picture</button>
+              <button onClick={handleDeleteAccount} className="delete-account-btn">Delete Account</button>
+            </>
+          ) : (
+            <button className="edit-profile-btn" onClick={() => setIsEditingProfile(true)}>
+              <FaPencilAlt style={{marginRight: '10px'}}/> Edit Profile
+            </button>
+          )}
+        </div>
       </div>
 
-      {Object.values(userReviews).map(review => (
+      {Object.values(userReviews).map((review) => (
         <div className='ProfilePage-review-tile' key={review.id}>
           <div className='ProfilePage-review-header'>
-            <p>Product: {review.Product.name}</p>
+            <h3>{review.Product.name}</h3>
+            <p className="review-date">{new Date(review.createdAt).toLocaleDateString()}</p>
+          </div>
+          <div className="review-content">
             <p>{review.content}</p>
-            <p>{new Date(review.createdAt).toLocaleDateString()}</p>
           </div>
         </div>
       ))}
 
-      {/* Upload Modal */}
       <UploadModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

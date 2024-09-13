@@ -2,7 +2,7 @@ const express = require('express');
 const { Op } = require('sequelize');
 const bcrypt = require('bcryptjs');
 const { setTokenCookie, restoreUser } = require('../../utils/auth');
-const { User } = require('../../db/models');
+const { User, ProfileImage } = require('../../db/models');
 const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 const router = express.Router();
@@ -55,27 +55,39 @@ router.post('/', validateLogin, async (req, res, next) => {
 }
 );
 
-router.get(
-  '/',
-  (req, res) => {
-    const { user } = req;
-    if (user) {
+router.get('/', async (req, res) => {
+  const { user } = req;
+
+  if (user) {
+    try {
+      // Fetch the profile image for the user
+      const profileImage = await ProfileImage.findOne({
+        where: { userId: user.id },
+      });
+
       const safeUser = {
         id: user.id,
         display_name: user.display_name,
         email: user.email,
+        bio: user.bio,
         username: user.username,
+        profileImageUrl: profileImage ? profileImage.url : null,
+        createdAt: user.createdAt,
       };
-      return res.json({
-        user: safeUser
-      });
-    } else return res.json({ user: null });
-  }
-);
 
-router.delete(
-  '/',
-  (_req, res) => {
+      return res.json({
+        user: safeUser,
+      });
+    } catch (err) {
+      console.error('Error fetching profile image:', err);
+      return res.status(500).json({ error: 'Failed to fetch profile image' });
+    }
+  } else {
+    return res.json({ user: null });
+  }
+});
+
+router.delete('/', (_req, res) => {
     res.clearCookie('token');
     return res.json({ message: 'success' });
   }

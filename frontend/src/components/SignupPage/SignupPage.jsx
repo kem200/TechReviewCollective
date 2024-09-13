@@ -13,6 +13,9 @@ const SignupPage = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [errors, setErrors] = useState([]);
+    const [showPassword, setShowPassword] = useState(false);
+    const [passwordTouched, setPasswordTouched] = useState(false);
+    const [confirmPasswordTouched, setConfirmPasswordTouched] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -30,12 +33,19 @@ const SignupPage = () => {
         }
     };
 
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const isPasswordValid = password.length >= 6;
+    const doPasswordsMatch = password === confirmPassword && password.length > 0;
+
     return (
         <div className="SignupPage-Main">
             <h1>Signup to TechReviewCollective</h1>
             <form onSubmit={handleSubmit}>
                 {errors.length > 0 && (
-                    <ul>
+                    <ul className="error-list">
                         {errors.map((error, idx) => (
                             <li key={idx}>{error}</li>
                         ))}
@@ -43,7 +53,7 @@ const SignupPage = () => {
                 )}
                 <input
                     type="text"
-                    placeholder="Username"
+                    placeholder="Username (at least 4 characters)"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
@@ -57,25 +67,48 @@ const SignupPage = () => {
                 />
                 <input
                     type="email"
-                    placeholder="Email"
+                    placeholder="Email (valid email address)"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                 />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="Confirm Password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                />
+                <div className="password-container">
+                    <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Password (at least 6 characters)"
+                        value={password}
+                        onChange={(e) => {
+                            setPassword(e.target.value);
+                            setPasswordTouched(true);
+                        }}
+                        required
+                    />
+                    <span className="show-password" onClick={toggleShowPassword}>
+                        {showPassword ? "Hide" : "Show"}
+                    </span>
+                </div>
+                {passwordTouched && (
+                    <div className={`password-hint ${isPasswordValid ? 'valid' : 'invalid'}`}>
+                        {isPasswordValid ? 'Password length is sufficient' : 'Password must be at least 6 characters'}
+                    </div>
+                )}
+                <div className="password-container">
+                    <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Confirm Password"
+                        value={confirmPassword}
+                        onChange={(e) => {
+                            setConfirmPassword(e.target.value);
+                            setConfirmPasswordTouched(true);
+                        }}
+                        required
+                    />
+                </div>
+                {confirmPasswordTouched && (
+                    <div className={`password-match ${doPasswordsMatch ? 'match' : 'no-match'}`}>
+                        {doPasswordsMatch ? 'Passwords match' : 'Passwords do not match'}
+                    </div>
+                )}
                 <button type="submit">Signup</button>
             </form>
         </div>

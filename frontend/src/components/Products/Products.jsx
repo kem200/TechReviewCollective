@@ -80,6 +80,7 @@ function Products() {
                       <div className='wrapper'>
                         <div className="product-info">
                           <div className="product-name">{product.name}</div>
+                          <div className="product-brand">{product.brand}</div>
                         </div>
                         <div className="rating-placeholder" style={{ color: getRatingColor(product.averageRating) }}>
                           {product?.averageRating?.toFixed(1)}

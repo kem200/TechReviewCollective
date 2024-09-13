@@ -5,58 +5,177 @@
     align-items: center;
 }
 
-.Profile-Header {
-    padding: 1rem;
+.ProfilePage-Main .Profile-Header {
+    padding: 1.5rem;
     border-radius: 1rem;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
+    justify-content: space-between;
     margin: auto;
     width: 60vw;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+    background-color: #fff;
+    margin-bottom: 2rem;
+    position: relative;
+    gap: 2rem;
+    /* Add space between sections */
 }
 
-.Profile-Header p {
-    margin-left: 1rem;
-    margin-top: 0;
-    margin-bottom: 0;
-    color: rgb(25, 25, 25);
+.ProfilePage-Main .Profile-Image-Container {
+    flex: 0 0 auto;
+    text-align: center;
 }
 
-.Profile-Header h1 {
-    margin: 0 0 0 1rem;
-}
-
-#profile-img {
-    width: 100px;
-    height: 100px;
-    border-radius: 1000px;
-    margin-right: 1rem;
+.ProfilePage-Main .profile-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 100%;
     object-fit: cover;
-}
-
-.bio {
-    padding: 1.5rem;
-    max-width: 30vw;
-    margin-left: auto;
-}
-
-.ProfilePage-review-tile {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+}
+
+.ProfilePage-Main .Profile-Info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.ProfilePage-Main .Profile-Info h1 {
+    margin: 0;
+    font-size: 2rem;
+    color: #333;
+}
+
+.ProfilePage-Main .Profile-Info .member-since {
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.ProfilePage-Main .Profile-Info p {
+    margin: 0;
+    font-size: 1rem;
+    color: #555;
+}
+
+.ProfilePage-Main .bio-text {
+    font-size: 1rem;
+    color: #444;
+    background-color: #f9f9f9;
     padding: 1rem;
-    margin-top: .75rem;
-    width: 60vw;
-}
-
-.ProfilePage-review-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.spinner-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 100%;
-  }
+}
+
+.ProfilePage-Main .Profile-Actions {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+.ProfilePage-Main .action-btn,
+.ProfilePage-Main .save-changes-btn {
+    background-color: #1e45a0;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 150px;
+    text-align: center;
+}
+
+.edit-profile-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 150px;
+    text-align: center;
+}
+
+.edit-profile-btn:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.ProfilePage-Main .action-btn:hover,
+.ProfilePage-Main .save-changes-btn:hover {
+    background-color: #0056b3;
+}
+
+.ProfilePage-Main .delete-account-btn,
+.ProfilePage-Main .delete-picture-btn {
+    background-color: transparent;
+    color: #555;
+    border: 1px solid #ddd;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    width: 150px;
+    text-align: center;
+}
+
+.ProfilePage-Main .delete-account-btn:hover,
+.ProfilePage-Main .delete-picture-btn:hover {
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+.ProfilePage-Main input[type="text"],
+.ProfilePage-Main textarea {
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    border-radius: 5px;
+    margin-bottom: 1rem;
+    width: 100%;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    font-size: 1rem;
+}
+
+.ProfilePage-Main input[type="text"]:focus,
+.ProfilePage-Main textarea:focus {
+    border-color: #1e45a0;
+    outline: none;
+    box-shadow: 0 0 5px rgba(30, 69, 160, 0.5);
+}
+
+.ProfilePage-Main .ProfilePage-review-tile {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    margin-top: 1rem;
+    width: 60vw;
+    background-color: #fff;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.ProfilePage-Main .ProfilePage-review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ProfilePage-Main .review-date {
+    font-size: 0.9rem;
+    color: #999;
+}
+
+.ProfilePage-Main .review-content p {
+    font-size: 1rem;
+    color: #444;
+    line-height: 1.5;
+}

@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100vh;
+  padding-bottom: 2rem;
 }
 
 .ProductPage-img {
@@ -58,33 +58,92 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem;
 }
 
 .ReviewTile {
     box-sizing: border-box;
     margin-top: .75rem;
-    display: flex;
-    border-radius: .5rem;
-    height: 4rem;
+    border-radius: 1rem;
     padding: 1rem;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 60vw;
     align-items: center;
+    transition: max-height 0.3s ease;
+    overflow: hidden;
+}
+
+.ReviewTile.expanded {
+    max-height: none;
+}
+
+.ReviewTile-content {
+    margin-left: auto;
+    max-width: 70%;
+    width: 100%;
+}
+
+.ReviewTile span {
+    color: rgb(87, 87, 87);
+    font-size: .75rem;
+    margin: 0;
 }
 
 .review-rating {
     margin-left: auto;
 }
 
-#ProductPage-profile-img {
-    margin-right: 1rem;
+.review-sort-menu {
+    display: flex;
+    width: 60vw;
+    justify-content: space-between;
+    align-items: center;
 }
 
 #ProductPage-profile-img {
+    margin-right: 1rem;
     width: 40px;
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
     border: 1px solid #ccc;
-  }
+}
+
+#review-content {
+    text-align: left;
+    max-height: 5rem;
+    width: 100%;
+    overflow-y: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.ReviewTile.expanded #review-content {
+    max-height: none;
+}
+
+.expand-button {
+    background: none;
+    border: none;
+    color: #2704d7;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.sort-container {
+    display: flex;
+    align-items: center;
+}
+
+#sort-reviews {
+    margin-left: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ccc;
+}
