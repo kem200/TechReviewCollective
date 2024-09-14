@@ -15,26 +15,26 @@ function LoginPage() {
         console.log('LoginPage component rendered');
     }, []);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setErrors([]);
-        return dispatch(sessionActions.login({ credential, password }))
-            .then(() => navigate('/'))
-            .catch(async (res) => {
-                const data = await res.json();
-                if (data && data.errors) setErrors(data.errors);
-            });
+        const result = await dispatch(sessionActions.login({ credential, password }));
+        if (result.success) {
+            navigate('/');
+        } else {
+            setErrors(Object.values(result.errors)); // Convert error object to array
+        }
     }
 
-    const handleDemoLogin = (e) => {
+    const handleDemoLogin = async (e) => {
         e.preventDefault();
         setErrors([]);
-        return dispatch(sessionActions.login({ credential: 'demo', password: 'password' }))
-            .then(() => navigate('/'))
-            .catch(async (res) => {
-                const data = await res.json();
-                if (data && data.errors) setErrors(data.errors);
-            });
+        const result = await dispatch(sessionActions.login({ credential: 'demo', password: 'password' }));
+        if (result.success) {
+            navigate('/');
+        } else {
+            setErrors(Object.values(result.errors)); // Convert error object to array
+        }
     }
 
     return (

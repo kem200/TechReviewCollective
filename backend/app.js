@@ -47,11 +47,7 @@ app.use(
 // Add routes handling file uploads (before JSON body parsing)
 app.use('/api/profile', require('./routes/api/profile')); // Use multer middleware for this route
 
-// Add body parsing middleware after file upload routes
-// app.use(express.urlencoded({ extended: false }));
-// app.use(express.json());
 
-// Connect all other routes
 app.use(routes); // Connect all the remaining routes
 
 // Error handling middlewares (unchanged)

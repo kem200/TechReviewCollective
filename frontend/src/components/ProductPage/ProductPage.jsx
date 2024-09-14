@@ -1,5 +1,5 @@
 import './ProductPage.css';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchProduct } from '../../store/products';
@@ -12,6 +12,7 @@ import { submitRating } from '../../store/rating';
 
 function ProductPage() {
     const { productId } = useParams();
+    const navigate = useNavigate();
     const product = useSelector((state) => state.products.singleProduct);
     const reviews = useSelector(state => state.reviews.reviewsByProduct[productId]?.reviews || {});
     const sessionUser = useSelector(state => state.session.user);
@@ -36,11 +37,19 @@ function ProductPage() {
     }, [dispatch, productId]);
 
     const handleRateButtonClick = () => {
-        setIsRatingModalOpen(true);
+        if (!sessionUser) {
+            navigate('/signup');
+        } else {
+            setIsRatingModalOpen(true);
+        }
     };
 
     const handleReviewButtonClick = () => {
-        setIsReviewModalOpen(true);
+        if (!sessionUser) {
+            navigate('/signup');
+        } else {
+            setIsReviewModalOpen(true);
+        }
     };
 
     const handleCloseRatingModal = () => {

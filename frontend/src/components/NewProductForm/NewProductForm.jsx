@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { createProduct } from '../../store/products';
+import { createProduct, setProductErrors } from '../../store/products';
 import { fetchCategories } from '../../store/categories';
 import { useNavigate } from 'react-router-dom';
 import { ClipLoader } from 'react-spinners';
@@ -14,13 +14,13 @@ function NewProductForm() {
   const [categoryId, setCategoryId] = useState(null);
   const [images, setImages] = useState('');
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [showFailure, setShowFailure] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false); // State to manage success popup
   const [filteredCategories, setFilteredCategories] = useState([]);
 
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.categories); // Get categories from state
+  const errors = useSelector((state) => state.products.errors); // Get errors from Redux store
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,7 +29,6 @@ function NewProductForm() {
 
   useEffect(() => {
     if (category) {
-      // Filter categories based on user input
       setFilteredCategories(
         categories.filter((cat) =>
           cat.name.toLowerCase().includes(category.toLowerCase())
@@ -45,11 +44,7 @@ function NewProductForm() {
     setCategory(value);
 
     const selectedCategory = categories.find((cat) => cat.name === value);
-    if (selectedCategory) {
-      setCategoryId(selectedCategory.id);
-    } else {
-      setCategoryId(null);
-    }
+    setCategoryId(selectedCategory ? selectedCategory.id : null);
   };
 
   const handleSubmit = (e) => {
@@ -76,18 +71,19 @@ function NewProductForm() {
     };
 
     try {
-      const response = await dispatch(createProduct(newProduct));
-      if (response) {
-        setShowSuccess(true);
+      const createdProduct = await dispatch(createProduct(newProduct)); // Await for the created product
+      setIsLoading(false);
+      if (createdProduct && createdProduct.id) { // Check if createdProduct and its ID exist
+        setShowSuccess(true); // Show success popup
         setTimeout(() => {
           setShowSuccess(false);
-          navigate(`/products/${response.id}`);
-        }, 3000);
+          navigate(`/products/${createdProduct.id}`); // Navigate to new product after showing success
+        }, 3000); // 3 seconds delay
+      } else {
+        throw new Error('Failed to retrieve the new product ID.');
       }
     } catch (error) {
-      setShowFailure(true);
-      setTimeout(() => setShowFailure(false), 3000);
-    } finally {
+      console.error('Failed to add product:', error);
       setIsLoading(false);
     }
   };
@@ -97,14 +93,18 @@ function NewProductForm() {
       <h2>New Product Form</h2>
 
       <p className="form-intro" style={{ color: "#333" }}>
-        Can&apos;t find the product you&apos;re looking for?
-        Before adding a new product, please use the search function to ensure it isn&apos;t already in our database.
-        If it&apos;s not, help the community by adding it!
-        By sharing accurate information about new tech products, you make it easier for others to find and review them.
-        Please make sure all details are correct to maintain the quality and reliability of our platform.
+        Can&apos;t find the product you&apos;re looking for? Before adding a new product, please use the search function to ensure it isn&apos;t already in our database. If it&apos;s not, help the community by adding it!
       </p>
 
       <form className='new-product-form' onSubmit={handleSubmit}>
+        {errors && ( // Display errors from Redux store
+          <div className="error-messages">
+            {Object.values(errors).map((error, idx) => (
+              <p key={idx} className="error-text">{error}</p>
+            ))}
+          </div>
+        )}
+
         <label>
           Brand:
           <input
@@ -139,10 +139,6 @@ function NewProductForm() {
             placeholder="Enter the model number (e.g., MQ9R3LL/A)"
             required
           />
-          <span>
-            Note: The model number is usually found on the product box or the device itself.
-            If you can&apos;t find the model number, use the product name instead.
-          </span>
         </label>
 
         <label>
@@ -171,6 +167,7 @@ function NewProductForm() {
             value={images}
             onChange={(e) => setImages(e.target.value)}
             placeholder="Enter a valid image URL preferably directly from the manufacturer"
+            required
           />
         </label>
 
@@ -200,18 +197,10 @@ function NewProductForm() {
         </div>
       )}
 
-      {showSuccess && (
+      {showSuccess && ( // Success Popup
         <div className="popup">
           <div className="popup-content">
             <h2>Product added successfully!</h2>
-          </div>
-        </div>
-      )}
-
-      {showFailure && (
-        <div className="popup">
-          <div className="popup-content">
-            <h2>Failed to add product. Please try again.</h2>
           </div>
         </div>
       )}

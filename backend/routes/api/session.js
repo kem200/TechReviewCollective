@@ -52,8 +52,7 @@ router.post('/', validateLogin, async (req, res, next) => {
   return res.json({
     user: safeUser
   });
-}
-);
+});
 
 router.get('/', async (req, res) => {
   const { user } = req;
@@ -89,9 +88,9 @@ router.get('/', async (req, res) => {
 });
 
 router.delete('/', (_req, res) => {
-    res.clearCookie('token');
-    return res.json({ message: 'success' });
-  }
+  res.clearCookie('token');
+  return res.json({ message: 'success' });
+}
 );
 
 module.exports = router;

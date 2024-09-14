@@ -137,17 +137,30 @@ router.get('/:productId', async (req, res, next) => {
 // Creates a new product (Requires authentication)
 router.post('/', restoreUser, requireAuth, async (req, res, next) => {
   const { name, description, category, brand, model_number, images } = req.body;
-
+  console.log(req.body);
   try {
-    // Create the product first
+    // Check if a product with the same name already exists
+    const existingProductByName = await Product.findOne({ where: { name } });
+    if (existingProductByName) {
+      return res.status(400).json({ errors: { name: 'A product with this name already exists.' } });
+    }
+
+    // Check if a product with the same model number already exists
+    const existingProductByModelNumber = await Product.findOne({ where: { model_number } });
+    if (existingProductByModelNumber) {
+      return res.status(400).json({ errors: { model_number: 'A product with this model number already exists.' } });
+    }
+
+    // Create the product if no duplicates are found
     const newProduct = await Product.create({
       name,
       description,
-      category_id: category, // Use category_id instead of category name
+      category_id: category,
       brand,
       model_number
     });
 
+    // Add images if provided
     if (images && images.length > 0) {
       const imageInstances = images.map((url) => ({
         product_id: newProduct.id,
@@ -166,7 +179,8 @@ router.post('/', restoreUser, requireAuth, async (req, res, next) => {
 
     return res.status(201).json(productWithImages);
   } catch (err) {
-    next(err);
+    // Return validation errors or other errors as JSON
+    return res.status(500).json({ errors: { server: 'An error occurred while creating the product.' } });
   }
 });
 

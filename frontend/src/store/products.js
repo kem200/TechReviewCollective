@@ -6,7 +6,7 @@ const ADD_PRODUCT = 'products/ADD_PRODUCT';
 const UPDATE_PRODUCT = 'products/UPDATE_PRODUCT';
 const DELETE_PRODUCT = 'products/DELETE_PRODUCT';
 const SEARCH_PRODUCTS = 'products/SEARCH_PRODUCTS';
-
+const SET_PRODUCT_ERRORS = 'products/SET_PRODUCT_ERRORS';
 
 // Action Creators
 const loadProducts = (category, products, totalPages, currentPage) => ({
@@ -20,7 +20,7 @@ const loadProducts = (category, products, totalPages, currentPage) => ({
 const getProduct = (product) => ({
     type: GET_PRODUCT,
     product,
-})
+});
 
 const addProduct = (category, product) => ({
     type: ADD_PRODUCT,
@@ -45,10 +45,15 @@ const searchProducts = (products) => ({
     products,
 });
 
+const setProductErrors = (errors) => ({
+    type: SET_PRODUCT_ERRORS,
+    payload: errors,
+});
+
 // Thunk to Fetch All Products with Pagination
 export const fetchProducts = (category = '', page = 1, limit = 20) => async (dispatch) => {
     const queryString = new URLSearchParams({
-        category, // If category is empty, it won't be included in the query
+        category,
         page,
         limit,
     }).toString();
@@ -58,11 +63,10 @@ export const fetchProducts = (category = '', page = 1, limit = 20) => async (dis
     if (response.ok) {
         const data = await response.json();
 
-        if (Array.isArray(data.products) && data.products.length > 0) { // Check if products is a non-empty array
+        if (Array.isArray(data.products) && data.products.length > 0) {
             dispatch(loadProducts(category, data.products, data.totalPages, data.currentPage));
             return data.products;
         } else {
-            // Do not dispatch anything if no new products are returned
             console.warn(`No more products found for category: ${category}`);
             return [];
         }
@@ -78,7 +82,6 @@ export const searchForProducts = (query) => async (dispatch) => {
 
     if (response.ok) {
         const data = await response.json();
-        console.log(data)
         dispatch(searchProducts(data.products));
         return data.products;
     } else {
@@ -95,48 +98,73 @@ export const fetchProduct = (productId) => async (dispatch) => {
         const product = await response.json();
         dispatch(getProduct(product));
     }
-}
+};
 
 // Thunk to Add a New Product
 export const createProduct = (productData) => async (dispatch) => {
-    const response = await csrfFetch('/api/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(productData),
-    });
+    try {
+        const response = await csrfFetch('/api/products', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(productData),
+        });
 
-    if (response.ok) {
-        const newProduct = await response.json();
-        dispatch(addProduct(productData.category, newProduct)); // Pass the category and new product
-        return newProduct; // Return the new product data
-    } else {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to create product');
+        if (response.ok) {
+            const newProduct = await response.json();
+            dispatch(addProduct(productData.category, newProduct));
+            dispatch(setProductErrors(null));
+            return newProduct;
+        }
+    } catch (error) {
+        console.error('Error creating product:', error);
+        const { data } = error;
+        const errorData = data.errors || [data.error];
+        dispatch(setProductErrors(errorData));
+        throw error; 
     }
 };
 
 // Thunk to Update a Product
 export const editProduct = (productId, productData) => async (dispatch) => {
-    const response = await fetch(`/api/products/${productId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(productData),
-    });
+    try {
+        const response = await csrfFetch(`/api/products/${productId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(productData),
+        });
 
-    if (response.ok) {
-        const updatedProduct = await response.json();
-        dispatch(updateProduct(updatedProduct));
+        if (response.ok) {
+            const updatedProduct = await response.json();
+            dispatch(updateProduct(productData.category, updatedProduct));
+            dispatch(setProductErrors(null)); // Clear errors on success
+            return updatedProduct;
+        }
+    } catch (error) {
+        console.error('Error updating product:', error);
+        const { data } = error;
+        const errorData = data.errors || [data.error];
+        dispatch(setProductErrors(errorData));
+        throw error;
     }
 };
 
 // Thunk to Delete a Product
-export const removeProduct = (productId) => async (dispatch) => {
-    const response = await fetch(`/api/products/${productId}`, {
-        method: 'DELETE',
-    });
+export const removeProduct = (productId, category) => async (dispatch) => {
+    try {
+        const response = await csrfFetch(`/api/products/${productId}`, {
+            method: 'DELETE',
+        });
 
-    if (response.ok) {
-        dispatch(deleteProduct(productId));
+        if (response.ok) {
+            dispatch(deleteProduct(category, productId));
+            dispatch(setProductErrors(null)); // Clear errors on success
+        }
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        const { data } = error;
+        const errorData = data.errors || [data.error];
+        dispatch(setProductErrors(errorData));
+        throw error;
     }
 };
 
@@ -144,18 +172,19 @@ const initialState = {
     productsByCategory: {},
     singleProduct: {},
     searchResults: [],
+    errors: null, // New state for errors
 };
 
 // Products Reducer
 const productsReducer = (state = initialState, action) => {
     switch (action.type) {
         case LOAD_PRODUCTS: {
-            const { category, products, totalPages, currentPage } = action; // Destructure action payload
+            const { category, products, totalPages, currentPage } = action;
             const newProducts = {};
 
             if (!Array.isArray(products)) {
                 console.error('Products data is not an array:', products);
-                return state; // Gracefully handle incorrect data
+                return state;
             }
 
             products.forEach((product) => {
@@ -176,17 +205,14 @@ const productsReducer = (state = initialState, action) => {
         }
 
         case GET_PRODUCT: {
-            const { product } = action; // Destructure action payload
             return {
                 ...state,
-                singleProduct: product,
+                singleProduct: action.product,
             };
         }
 
         case ADD_PRODUCT: {
-            const { category, product } = action; // Destructure action payload
-
-            // If no category exists, initialize it
+            const { category, product } = action;
             if (!state.productsByCategory[category]) {
                 state.productsByCategory[category] = {
                     products: {},
@@ -208,7 +234,7 @@ const productsReducer = (state = initialState, action) => {
         }
 
         case UPDATE_PRODUCT: {
-            const { category, product } = action; // Destructure action payload
+            const { category, product } = action;
 
             return {
                 ...state,
@@ -223,9 +249,9 @@ const productsReducer = (state = initialState, action) => {
         }
 
         case DELETE_PRODUCT: {
-            const { category, productId } = action; // Destructure action payload
+            const { category, productId } = action;
 
-            if (!state.productsByCategory[category]) return state; // Gracefully handle missing category
+            if (!state.productsByCategory[category]) return state;
 
             const newProducts = { ...state.productsByCategory[category].products };
             delete newProducts[productId];
@@ -249,9 +275,17 @@ const productsReducer = (state = initialState, action) => {
             };
         }
 
+        case SET_PRODUCT_ERRORS: {
+            return {
+                ...state,
+                errors: action.payload,
+            };
+        }
+
         default:
             return state;
     }
 };
 
 export default productsReducer;
+export { setProductErrors };

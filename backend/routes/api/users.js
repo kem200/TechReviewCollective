@@ -4,6 +4,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
+const { Op } = require('sequelize');
 
 const { setTokenCookie, requireAuth } = require('../../utils/auth');
 const { User } = require('../../db/models');
@@ -28,24 +29,36 @@ const validateSignup = [
     handleValidationErrors
   ];
 
-router.post('/', validateSignup, async (req, res) => {
-      const { email, password, username, display_name } = req.body;
-      const hashedPassword = bcrypt.hashSync(password);
-      const user = await User.create({ email, username, hashedPassword, display_name });
+  router.post('/', validateSignup, async (req, res) => {
+    const { email, password, username, display_name } = req.body;
 
-      const safeUser = {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-        display_name: user.display_name,
-      };
+    const existingUser = await User.findOne({
+      where: {
+        [Op.or]: [{ email }, { username }]
+      }
+    });
 
-      await setTokenCookie(res, safeUser);
-
-      return res.json({
-        user: safeUser
+    if (existingUser) {
+      return res.status(400).json({
+        error: 'Email or username already exists'
       });
     }
-  );
+
+    const hashedPassword = bcrypt.hashSync(password);
+    const user = await User.create({ email, username, hashedPassword, display_name });
+
+    const safeUser = {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      display_name: user.display_name,
+    };
+
+    await setTokenCookie(res, safeUser);
+
+    return res.json({
+      user: safeUser
+    });
+  });
 
 module.exports = router;

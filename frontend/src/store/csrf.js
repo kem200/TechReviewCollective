@@ -1,18 +1,11 @@
 import Cookies from 'js-cookie';
 
 export async function csrfFetch(url, options = {}) {
-  // set options.method to 'GET' if there is no method
   options.method = options.method || 'GET';
-  // set options.headers to an empty object if there is no headers
   options.headers = options.headers || {};
 
-  // if the options.method is not 'GET', then set the "Content-Type" header to
-  // "application/json", and set the "XSRF-TOKEN" header to the value of the
-  // "XSRF-TOKEN" cookie
   if (options.method.toUpperCase() !== 'GET') {
-    // Check if we're sending FormData
     if (options.body instanceof FormData) {
-      // If we're sending FormData, we should not set Content-Type header manually.
       delete options.headers['Content-Type'];
     } else {
       options.headers['Content-Type'] = 'application/json';
@@ -20,19 +13,20 @@ export async function csrfFetch(url, options = {}) {
     options.headers['XSRF-Token'] = Cookies.get('XSRF-TOKEN');
   }
 
-  // call the default window's fetch with the url and the options passed in
   const res = await window.fetch(url, options);
 
-  // if the response status code is 400 or above, then throw an error with the
-  // error being the response
-  if (res.status >= 400) throw res;
+  if (res.status >= 400) {
+    const errorData = await res.json();
+    // Throw an error with response and data so it can be destructured later
+    const error = new Error('Request failed');
+    error.response = res;
+    error.data = errorData;
+    throw error;
+  }
 
-  // if the response status code is under 400, then return the response to the
-  // next promise chain
   return res;
 }
 
-// call this to get the "XSRF-TOKEN" cookie, should only be used in development
 export function restoreCSRF() {
   return csrfFetch('/api/csrf/restore');
 }
